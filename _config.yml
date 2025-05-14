@@ -14,3 +14,5 @@ plugins:
 header_pages:
   - about.md
   - blog.md
+
+google_analytics: G-7FF6SF2HED
