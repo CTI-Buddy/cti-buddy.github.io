@@ -1,8 +1,8 @@
 ---
----  // Jekyll front matter (required)
-@import "minima";  // Inherit defaults
+---  // Required Jekyll front matter
+@import "minima";  // Inherit base styles (optional)
 
-// Override with cyber theme
+/* Your custom cyber theme */
 :root {
   --primary: #00ffff;
   --secondary: #00ff00;
@@ -14,6 +14,9 @@ body {
   font-family: 'Courier New', monospace;
 }
 
-.cyber-header {
-  border-bottom: 1px solid var(--primary);
+/* Target blog-specific elements */
+.post, .post-title {
+  color: var(--primary);
+  border-left: 3px solid var(--secondary);
+  padding-left: 15px;
 }
