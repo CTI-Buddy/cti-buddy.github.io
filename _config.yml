@@ -1,5 +1,16 @@
+# _config.yml
 title: "Dr. Matt Ryan, PhD"
-description: "Cybersecurity Specialist"
+description: "Cybersecurity Specialist & Threat Researcher"
+baseurl: ""  
+url: "https://cti-buddy.github.io"  # or "https://yourdomain.com"
+
+# Jekyll settings
 theme: minima
 plugins:
-  - jekyll-feed  # RSS
+  - jekyll-feed  # RSS/Atom feed
+  - jekyll-seo-tag  # meta tags
+
+# Custom variables
+header_pages:
+  - about.md
+  - blog.md
