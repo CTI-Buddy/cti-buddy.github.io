@@ -15,22 +15,15 @@
   </script>
   {% endif %}
 </head>
-<body class="cyber-theme"> <!-- ADDED THIS CLASS -->
-  <header class="cyber-header">
-    <nav>
-      <a href="{{ '/' | relative_url }}">Home</a>
-      {% for page in site.header_pages %}
-        <a href="{{ page | relative_url }}">{{ page | remove: '.md' | capitalize }}</a>
-      {% endfor %}
-    </nav>
-  </header>
+<body class="cyber-theme">
+  
+  {% include header.html %}  <!-- Use shared header -->
 
-  <main class="cyber-main"> <!-- Added class for main content -->
+  <main class="cyber-main">
     {{ content }}
   </main>
 
-  <footer class="cyber-footer"> <!-- Added class for footer -->
-    <p>&copy; {{ site.time | date: '%Y' }} {{ site.title }}</p>
-  </footer>
+  {% include footer.html %}  <!-- Use shared footer -->
+
 </body>
 </html>
