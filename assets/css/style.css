@@ -61,6 +61,10 @@
     margin-bottom: 15px; /* Maintains spacing */
 }
 
+.cyber-main {
+  padding-top: 4.5rem; /* Adjust this based on your header height */
+}
+
 /* Responsive adjustment for smaller screens */
 @media (max-width: 768px) {
     .hero-text h1 {
