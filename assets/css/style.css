@@ -643,66 +643,76 @@
   margin-bottom: 1rem;
 }
 
+/* Responsive grid for blog tiles */
 .blog-section .blog-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.5rem;
-  max-width: 1200px;
-  margin: 0 auto;
 }
 
+/* Tiles styling */
 .blog-section .blog-tile {
-  background-color: rgba(25, 25, 25, 0.8); /* semi-transparent dark */
+  background-color: rgba(40, 40, 40, 0.7); /* semi-transparent dark */
   border: 1px solid var(--gray);
   border-radius: 12px;
   padding: 1rem;
   text-align: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease;
   font-family: 'Inter', sans-serif;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  height: 100%; /* fill column height */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  justify-content: flex-start;
+  cursor: pointer;
+  min-height: 350px; /* uniform tile height */
 }
 
 .blog-section .blog-tile:hover {
   transform: scale(1.03);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
+/* Image inside tile */
 .blog-section .blog-tile img {
   width: 100%;
-  aspect-ratio: 4 / 3;
+  height: 160px;
   object-fit: cover;
   border-radius: 8px;
   margin-bottom: 0.8rem;
+  flex-shrink: 0;
 }
 
+/* Post title */
 .blog-section .blog-tile h3 {
   font-family: 'Segoe UI', sans-serif;
   font-size: 1.1rem;
   margin: 0.5rem 0;
   color: var(--green);
+  flex-shrink: 0;
 }
 
+/* Date */
 .blog-section .blog-tile .blog-date {
   color: var(--gray);
   font-size: 0.85rem;
   margin-bottom: 0.4rem;
+  flex-shrink: 0;
 }
 
+/* Tagline text */
 .blog-section .blog-tile .tagline {
   font-size: 0.95rem;
   color: var(--white);
   font-family: 'Segoe UI', sans-serif;
+  margin-top: auto; /* push tagline to bottom if content is shorter */
 }
 
+/* Links inside tile */
 .blog-section .blog-tile a {
   text-decoration: none;
   color: inherit;
-  display: block;
+  display: flex;
+  flex-direction: column;
   height: 100%;
 }
+
 
 
