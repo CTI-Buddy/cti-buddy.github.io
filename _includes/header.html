@@ -1,0 +1,9 @@
+<!-- _includes/header.html -->
+<header class="cyber-header">
+  <nav>
+    <a href="{{ '/' | relative_url }}">Home</a>
+    {% for item in site.header_pages %}
+      <a href="{{ item | relative_url }}">{{ item | capitalize }}</a>
+    {% endfor %}
+  </nav>
+</header>
