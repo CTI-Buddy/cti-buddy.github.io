@@ -39,15 +39,20 @@
     });
   });
 </script>
-  <script>
+<script>
   document.addEventListener("DOMContentLoaded", function () {
     const now = new Date();
+
+    // Format full date
     const formattedDate = now.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     });
     document.getElementById("current-date").textContent = formattedDate;
+
+    // Insert current year
+    document.getElementById("current-year").textContent = now.getFullYear();
   });
 </script>
 </body>
