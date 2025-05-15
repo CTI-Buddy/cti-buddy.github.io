@@ -20,3 +20,11 @@ header_pages:
   - blog
 
 google_analytics: G-7FF6SF2HED
+
+social_links:
+  github: "yourhandle"
+  bluesky: "yourhandle"
+  mastodon: "yourhandle"
+  medium: "yourhandle"
+  scholar: "yourhandle"
+  linkedin: "yourhandle"
