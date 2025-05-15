@@ -39,6 +39,16 @@
     });
   });
 </script>
-  
+  <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    document.getElementById("current-date").textContent = formattedDate;
+  });
+</script>
 </body>
 </html>
