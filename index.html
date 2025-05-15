@@ -141,5 +141,15 @@ title: Home
         
         animateBinary();
         
-
+        // Add glitch effect on hover for section titles
+        const glitchTitles = document.querySelectorAll('.section-title');
+        glitchTitles.forEach(title => {
+            title.addEventListener('mouseover', () => {
+                title.classList.add('glitch');
+            });
+            title.addEventListener('mouseout', () => {
+                title.classList.remove('glitch');
+            });
+        });
+    </script>
 
