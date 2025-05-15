@@ -16,7 +16,7 @@ defaults:
       layout: default    # Uses _layouts/default.html
 
 header_pages:
-  - about.md
-  - blog.md
+  - about
+  - blog
 
 google_analytics: G-7FF6SF2HED
