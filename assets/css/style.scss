@@ -2,14 +2,18 @@
 ---
 @import "minima";
 
+/* ===== Cyber Theme Variables ===== */
 :root {
   --primary: #00ffff;
   --secondary: #00ff00;
   --dark: #0a0a0a;
+  --darker: #050505;
   --text: #ffffff;
+  --gray: #333333;
+  --matrix-green: #00ff41;
 }
 
-/* Base cyber theme */
+/* ===== Base Styles ===== */
 body.cyber-theme {
   background: var(--dark);
   color: var(--text);
@@ -17,90 +21,92 @@ body.cyber-theme {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  line-height: 1.6;
 }
 
-/* Header */
-.cyber-theme .cyber-header {
-  background: rgba(10, 10, 10, 0.9);
+/* ===== Header Styles ===== */
+.cyber-header {
+  background: rgba(10, 10, 10, 0.95);
   border-bottom: 1px solid var(--primary);
-  padding: 1rem;
-}
-
-/* Main content */
-.cyber-theme .cyber-main {
-  flex: 1;
-  padding: 2rem;
-  background: var(--dark);
-}
-
-/* Posts and pages */
-.cyber-theme .post,
-.cyber-theme .page-content {
-  color: var(--text);
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.cyber-theme .post-title {
-  color: var(--primary);
-  border-left: 3px solid var(--secondary);
-  padding-left: 15px;
-}
-
-/* Footer */
-.cyber-theme .cyber-footer {
-  background: rgba(10, 10, 10, 0.9);
-  border-top: 1px solid var(--primary);
-  padding: 1rem;
-  text-align: center;
-}
-
-/* Footer & Contact Section */
-.cyber-footer {
-  text-align: center;
-  padding: 2rem;
-  color: var(--gray);
+  padding: 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
   
-  p {
-    margin: 0.5rem 0;
+  nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    
+    a {
+      color: var(--text);
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 1.1rem;
+      transition: all 0.3s;
+      
+      &:hover {
+        color: var(--primary);
+        text-shadow: 0 0 10px var(--primary);
+      }
+    }
   }
 }
 
-.footer-updated {
-  font-size: 0.8rem;
-  color: var(--gray);
+/* ===== Main Content ===== */
+.cyber-main {
+  flex: 1;
+  padding: 3rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
 }
 
-#contact {
-  padding: 4rem 0;
-  border-top: 1px solid var(--primary);
-}
-
-.contact-subtitle {
-  text-align: center;
-  max-width: 600px;
-  margin: 0 auto 50px !important;
-  color: var(--matrix-green);
-}
-
-/* Blog listing styles */
+/* ===== Blog Styles ===== */
 .post-preview {
-  background: rgba(18, 18, 18, 0.7);
+  background: rgba(18, 18, 18, 0.8);
   border-left: 3px solid var(--primary);
-  padding: 1.5rem;
-  margin-bottom: 2rem;
+  padding: 2rem;
+  margin-bottom: 3rem;
   transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      to right,
+      transparent,
+      rgba(0, 255, 255, 0.05),
+      transparent
+    );
+    pointer-events: none;
+    z-index: -1;
+  }
 
   &:hover {
     border-left-color: var(--secondary);
-    transform: translateX(5px);
+    transform: translateX(10px);
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.3);
   }
 
   h2 a {
     color: var(--primary);
     text-decoration: none;
+    transition: all 0.3s;
+    
     &:hover {
-      text-shadow: 0 0 5px var(--secondary);
+      color: var(--secondary);
+      text-shadow: 0 0 10px var(--secondary);
     }
   }
 }
@@ -109,9 +115,113 @@ body.cyber-theme {
   color: var(--matrix-green);
   font-family: 'Courier New', monospace;
   font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  
+  &::before {
+    content: ">_ ";
+    color: var(--secondary);
+  }
 }
 
 .post-excerpt {
-  margin-top: 0.5rem;
+  margin-top: 1rem;
   color: #ddd;
+  position: relative;
+  padding-left: 1.5rem;
+  
+  &::before {
+    content: "└─>";
+    position: absolute;
+    left: 0;
+    color: var(--primary);
+  }
+}
+
+/* ===== Contact Section ===== */
+#contact {
+  padding: 4rem 0;
+  border-top: 1px solid var(--primary);
+  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7));
+}
+
+.contact-subtitle {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto 3rem;
+  color: var(--matrix-green);
+  font-size: 1.1rem;
+}
+
+.contact-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin: 2rem 0;
+  
+  a {
+    color: var(--text);
+    font-size: 2rem;
+    transition: all 0.3s;
+    position: relative;
+    
+    &:hover {
+      color: var(--primary);
+      transform: translateY(-5px);
+      
+      &::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: -2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.8rem;
+        color: var(--primary);
+      }
+    }
+  }
+}
+
+/* ===== Footer Styles ===== */
+.cyber-footer {
+  background: rgba(10, 10, 10, 0.95);
+  border-top: 1px solid var(--primary);
+  padding: 2rem;
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  
+  p {
+    margin: 0.5rem 0;
+    color: var(--text);
+  }
+}
+
+.footer-updated {
+  font-size: 0.8rem;
+  color: var(--gray);
+  margin-top: 1rem;
+}
+
+/* ===== Responsive Adjustments ===== */
+@media (max-width: 768px) {
+  .cyber-header nav {
+    gap: 1rem;
+    padding: 1rem;
+  }
+  
+  .cyber-main {
+    padding: 2rem 1rem;
+  }
+  
+  .post-preview {
+    padding: 1.5rem;
+  }
+  
+  .contact-links {
+    gap: 1.5rem;
+    
+    a {
+      font-size: 1.8rem;
+    }
+  }
 }
