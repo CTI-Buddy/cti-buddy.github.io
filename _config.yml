@@ -19,6 +19,10 @@ header_pages:
   - about
   - blog
 
+  footer_pages:
+  - about
+  - blog
+
 google_analytics: G-7FF6SF2HED
 
 social_links:
