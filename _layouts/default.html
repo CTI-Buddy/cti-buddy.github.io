@@ -1,19 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   {% seo %}
 
-  <!-- Font Awesome CDN -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    integrity="sha512-pVPOHO+Wc0G0w1k5O4UZ2rkZ6Lv+8qx8uJZ6CVQ+ZBvHxDK5KZy4Z9QxOph5OxvPqG4HY0fGknKwJ3x1g1QYAw=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-  />
-
-  <!-- Your custom styles -->
+  <!-- Link to your site-wide stylesheet -->
   <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+
+  <!-- Font Awesome CDN (add this to support icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-Wo1h3u3ZFH/FJpVZhxGHKBgKQ9O/Vv2PRfK5Z6vWZFl8+iFj5Cn4Tc7Rv/N+3cB9aUXcVo+0bd72obvyT8yGEw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   {% if site.google_analytics %}
   <script async src="https://www.googletagmanager.com/gtag/js?id={{ site.google_analytics }}"></script>
@@ -25,3 +21,15 @@
   </script>
   {% endif %}
 </head>
+<body class="cyber-theme">
+  
+  {% include header.html %}
+
+  <main class="cyber-main">
+    {{ content }}
+  </main>
+
+  {% include footer.html %}
+
+</body>
+</html>
