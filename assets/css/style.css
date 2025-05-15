@@ -645,11 +645,14 @@
 
 .blog-section .blog-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
 }
 
 .blog-section .blog-tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
   background-color: var(--darker);
   border: 1px solid var(--gray);
   border-radius: 12px;
