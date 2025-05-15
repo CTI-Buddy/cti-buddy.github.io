@@ -655,6 +655,7 @@
     padding: 1rem;
     text-align: center;
     transition: transform 0.2s ease;
+    font-family: 'Inter', sans-serif; 
 
     &:hover {
       transform: scale(1.03);
@@ -683,7 +684,7 @@
 
     .tagline {
       font-size: 0.95rem;
-      color: #ccc;
+      color: var(--white);
       font-family: 'Segoe UI', sans-serif;
     }
 
