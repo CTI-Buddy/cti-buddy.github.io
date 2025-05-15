@@ -99,16 +99,19 @@ title: Home
     </section>
 
     <!-- Blog Section -->
-    <section id="blog" class="section" style="background-color: var(--darker); border-top: 1px solid var(--gray); border-bottom: 1px solid var(--gray);">
+<section id="blog" class="section" style="background-color: var(--darker); border-top: 1px solid var(--gray); border-bottom: 1px solid var(--gray);">
   <div class="container">
     <h2 class="section-title">> latest_posts</h2>
-    <div class="blog-posts">
+    <div class="blog-grid">
       {% for post in site.posts limit:3 %}
-        <article class="post-preview">
-          <h3><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
-          <p>{{ post.excerpt }}</p>
-          <p class="meta">Posted on {{ post.date | date: "%B %d, %Y" }}</p>
-        </article>
+        <div class="blog-tile">
+          <a href="{{ post.url | relative_url }}">
+            <img src="{{ post.image }}" alt="{{ post.title }} image">
+            <h3>{{ post.title }}</h3>
+            <p class="blog-date">{{ post.date | date: "%B %d, %Y" }}</p>
+            <p class="tagline">{{ post.tagline }}</p>
+          </a>
+        </div>
       {% endfor %}
     </div>
   </div>
