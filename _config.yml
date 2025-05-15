@@ -3,7 +3,7 @@ description: "Cybersecurity Specialist & Threat Researcher"
 baseurl: ""  
 url: "https://cti-buddy.github.io"
 
-theme: minima
+
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
