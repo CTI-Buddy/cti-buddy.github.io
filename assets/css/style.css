@@ -632,3 +632,64 @@
         .dropdown-content a[href*="scholar"]:hover { color: #4285f4; }
         .dropdown-content a[href*="bsky"]:hover { color: #0085ff; }
         .dropdown-content a[href*="mastodon"]:hover { color: #6364ff; }
+
+.blog-section {
+  padding: 2rem 1rem;
+
+  .section-title {
+    font-family: monospace;
+    color: var(--green);
+    margin-bottom: 1rem;
+  }
+
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .blog-tile {
+    background-color: var(--darker);
+    border: 1px solid var(--gray);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: scale(1.03);
+    }
+
+    img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 0.8rem;
+    }
+
+    h3 {
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 1.1rem;
+      margin: 0.5rem 0;
+      color: var(--green);
+    }
+
+    .blog-date {
+      color: var(--gray);
+      font-size: 0.85rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .tagline {
+      font-size: 0.95rem;
+      color: #ccc;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+  }
+}
