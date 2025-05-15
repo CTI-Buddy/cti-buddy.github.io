@@ -4,6 +4,7 @@ baseurl: ""
 url: "https://cti-buddy.github.io"
 
 sass:
+  sass_dir: _sass
   style: compressed
 
 plugins:
