@@ -26,5 +26,19 @@
 
   {% include footer.html %}  <!-- Use shared footer -->
 
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const glitchTitles = document.querySelectorAll('.section-title');
+    glitchTitles.forEach(title => {
+      title.addEventListener('mouseover', () => {
+        title.classList.add('glitch');
+      });
+      title.addEventListener('mouseout', () => {
+        title.classList.remove('glitch');
+      });
+    });
+  });
+</script>
+  
 </body>
 </html>
