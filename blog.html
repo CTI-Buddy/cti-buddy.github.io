@@ -7,18 +7,16 @@ permalink: /blog/
 <section class="section" style="background-color: var(--darker); border-top: 1px solid var(--gray);">
   <div class="container">
     <h2 class="section-title">> The Mattysploit Blog</h2>
-    <div class="post-grid">
+    <div class="blog-grid">
       {% for post in site.posts %}
-      <article class="post-tile">
-        <a href="{{ post.url | relative_url }}">
-          <img src="{{ post.image | default: '/img/default.jpg' }}" alt="{{ post.title }}">
-          <div class="post-meta">
+        <div class="blog-tile">
+          <a href="{{ post.url | relative_url }}">
+            <img src="{{ post.image }}" alt="{{ post.title }} image">
             <h3>{{ post.title }}</h3>
-            <p class="post-date">{{ post.date | date: "%B %d, %Y" }}</p>
-            <p class="post-tagline">{{ post.tagline | default: post.excerpt }}</p>
-          </div>
-        </a>
-      </article>
+            <p class="blog-date">{{ post.date | date: "%B %d, %Y" }}</p>
+            <p class="tagline">{{ post.tagline }}</p>
+          </a>
+        </div>
       {% endfor %}
     </div>
   </div>
