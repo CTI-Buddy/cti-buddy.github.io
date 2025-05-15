@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "A History of GraphAPI Attacks"
-date: 2025-07-25
+date: 2025-02-07
 tagline: "Everybody's in the Cloud, particularly the attacker"
 image: /IMG/020725.webp
 ---
