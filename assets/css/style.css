@@ -1003,3 +1003,27 @@ article.post .post-content {
   font-family: 'Inter', sans-serif !important;
 }
 
+/* Dropdown filter style */
+.tag-filter {
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+#tag-select {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--gray);
+  background-color: var(--lighter);
+  color: var(--text);
+}
+
+/* Blog tile image (if used) */
+.blog-tile-img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 1rem;
+  margin-bottom: 1rem;
+}
+
+
