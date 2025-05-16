@@ -978,10 +978,9 @@
 }
 
 /* Override global font settings for post content */
-.post-content, .post, .single-post {
-  font-family: Verdana, Geneva, sans-serif !important;
-  color: var(--light);
-  line-height: 1.6;
-  font-size: 1.1rem;
+.cyber.main .single-post .post-content,
+.single-post .post-content,
+article.post .post-content {
+  font-family: 'Inter', sans-serif !important;
 }
 
