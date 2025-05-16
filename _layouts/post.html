@@ -17,11 +17,11 @@ layout: default
       <div class="post-content">
         {{ content }}
       </div>
-      <div class="post-tags">
-        {% for tag in page.tags %}
-          <span class="tag">{{ tag }}</span>
-        {% endfor %}
-      </div>
+<div class="post-tags">
+  {% for tag in page.tags %}
+    <a class="tag" href="{{ '/blog/?tag=' | append: tag | relative_url }}">{{ tag }}</a>
+  {% endfor %}
+</div>
 <div class="post-nav">
   {% if page.previous %}
     <a class="nav-button prev-post" href="{{ page.previous.url | relative_url }}">
