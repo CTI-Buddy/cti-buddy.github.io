@@ -1042,3 +1042,7 @@ article.post .post-content {
   background-color: #111111 !important;
   color: #eeeeee !important;
 }
+
+.post-tag {
+  display: none !important;
+}
