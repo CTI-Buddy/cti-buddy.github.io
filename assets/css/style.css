@@ -529,6 +529,7 @@
 }
 
 .post-content {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
   line-height: 1.6;
   font-size: 1.1rem;
   max-width: 900px;
