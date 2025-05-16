@@ -1026,4 +1026,19 @@ article.post .post-content {
   margin-bottom: 1rem;
 }
 
+.tag-dropdown {
+  padding: 0.5rem;
+  font-size: 1rem;
+  background-color: var(--background); /* matches page background */
+  color: var(--text); /* ensures text is readable */
+  border: 1px solid var(--gray);
+  border-radius: 4px;
+  max-width: 200px;
+  margin-bottom: 2rem;
+}
 
+/* Consistent dropdown styling across browsers */
+.tag-dropdown option {
+  background-color: var(--background);
+  color: var(--text);
+}
