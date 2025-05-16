@@ -8,13 +8,16 @@ permalink: /blog/
   <div class="container">
     <h1 class="section-title">All Blog Posts</h1>
 
-    <!-- Tag filter buttons -->
+    <!-- Tag filter dropdown -->
     <div class="tag-filter">
-      <button class="tag-btn" data-tag="all">All</button>
-      {% assign all_tags = site.tags | sort %}
-      {% for tag in all_tags %}
-        <button class="tag-btn" data-tag="{{ tag[0] }}">{{ tag[0] }}</button>
-      {% endfor %}
+      <label for="tag-select" style="font-weight: bold;">Filter by tag:</label>
+      <select id="tag-select">
+        <option value="all">All</option>
+        {% assign all_tags = site.tags | sort %}
+        {% for tag in all_tags %}
+          <option value="{{ tag[0] }}">{{ tag[0] }}</option>
+        {% endfor %}
+      </select>
     </div>
 
     <!-- Blog posts list -->
@@ -23,15 +26,12 @@ permalink: /blog/
         <div class="blog-tile" data-tags="{{ post.tags | join: ',' }}">
           <a href="{{ post.url | relative_url }}">
             {% if post.image %}
-              <img src="{{ post.image }}" alt="{{ post.title }}" class="blog-image">
+              <img src="{{ post.image }}" alt="{{ post.title }}" class="blog-tile-img">
             {% endif %}
-            <div class="blog-info">
-              <h2 class="blog-title">{{ post.title }}</h2>
-              {% if post.tagline %}
-                <p class="tagline">{{ post.tagline }}</p>
-              {% endif %}
-              <p class="blog-date">{{ post.date | date: "%B %d, %Y" }}</p>
-            </div>
+            <h2>{{ post.title }}</h2>
+            {% if post.excerpt %}
+              <p class="tagline">{{ post.excerpt | strip_html | truncatewords: 20 }}</p>
+            {% endif %}
           </a>
         </div>
       {% endfor %}
@@ -41,21 +41,19 @@ permalink: /blog/
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    const buttons = document.querySelectorAll('.tag-btn');
-    const posts = document.querySelectorAll('.blog-tile');
+    const dropdown = document.getElementById("tag-select");
+    const posts = document.querySelectorAll(".blog-tile");
 
-    buttons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const tag = btn.getAttribute('data-tag');
+    dropdown.addEventListener("change", function () {
+      const selectedTag = this.value;
 
-        posts.forEach(post => {
-          const postTags = post.getAttribute('data-tags').split(',');
-          if (tag === 'all' || postTags.includes(tag)) {
-            post.style.display = '';
-          } else {
-            post.style.display = 'none';
-          }
-        });
+      posts.forEach(post => {
+        const postTags = post.getAttribute("data-tags").split(",");
+        if (selectedTag === "all" || postTags.includes(selectedTag)) {
+          post.style.display = "";
+        } else {
+          post.style.display = "none";
+        }
       });
     });
   });
