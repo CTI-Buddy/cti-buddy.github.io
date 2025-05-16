@@ -22,24 +22,22 @@ layout: default
           <span class="tag">{{ tag }}</span>
         {% endfor %}
       </div>
-<div class="post-nav" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-top: 2rem; gap: 1rem;">
-
+<div class="post-nav">
   {% if page.previous %}
-    <a class="prev-post" href="{{ page.previous.url | relative_url }}" style="flex: 1; text-align: left;">
+    <a class="nav-button prev-post" href="{{ page.previous.url | relative_url }}">
       ← {{ page.previous.title }}
     </a>
   {% endif %}
 
-  <a class="back-to-blog" href="{{ site.baseurl }}/blog" style="flex: 1; text-align: center;">
+  <a class="nav-button back-to-blog" href="{{ site.baseurl }}/blog">
     Back to Blog
   </a>
 
   {% if page.next %}
-    <a class="next-post" href="{{ page.next.url | relative_url }}" style="flex: 1; text-align: right;">
+    <a class="nav-button next-post" href="{{ page.next.url | relative_url }}">
       {{ page.next.title }} →
     </a>
   {% endif %}
-
 </div>
     </article>
   </div>
