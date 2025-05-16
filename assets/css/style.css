@@ -1029,8 +1029,8 @@ article.post .post-content {
 .tag-dropdown {
   padding: 0.5rem;
   font-size: 1rem;
-  background-color: var(--dark); /* matches page background */
-  color: var(--text); /* ensures text is readable */
+  background-color: #111111 !important;
+  color: #eeeeee !important;
   border: 1px solid var(--gray);
   border-radius: 4px;
   max-width: 200px;
@@ -1039,6 +1039,6 @@ article.post .post-content {
 
 /* Consistent dropdown styling across browsers */
 .tag-dropdown option {
-  background-color: var(--dark);
-  color: var(--text);
+  background-color: #111111 !important;
+  color: #eeeeee !important;
 }
