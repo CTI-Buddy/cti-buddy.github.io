@@ -470,6 +470,13 @@
         }
 
 /* Single Post Page Styles */
+
+/* Ensure post title/header is not sticky */
+
+.post-header {
+  position: static;
+}
+
 .post-image-container {
   text-align: center;
   margin-bottom: 2rem;
