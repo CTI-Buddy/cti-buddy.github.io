@@ -43,40 +43,25 @@ permalink: /blog/
 </section>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const dropdown = document.getElementById("tag-select");
-    const posts = document.querySelectorAll(".blog-tile");
+document.addEventListener("DOMContentLoaded", function () {
+  const dropdown = document.querySelector('.tag-dropdown');
+  const posts = document.querySelectorAll('.blog-tile');
 
-    // Helper: get URL param
-    function getURLParam(name) {
-      return new URLSearchParams(window.location.search).get(name);
-    }
+  dropdown.addEventListener('change', () => {
+    const selectedTag = dropdown.value.trim().toLowerCase();
 
-    // Filter posts by tag
-    function filterPostsByTag(tag) {
-      posts.forEach(post => {
-        const postTags = post.getAttribute("data-tags").split(",");
-        post.style.display = (tag === "all" || postTags.includes(tag)) ? "" : "none";
-      });
-    }
+    posts.forEach(post => {
+      const tagsAttr = post.getAttribute('data-tags');
+      if (!tagsAttr) return;
+      const postTags = tagsAttr.split(',').map(t => t.trim().toLowerCase());
 
-    // On load: check if tag param exists in URL
-    const urlTag = getURLParam("tag") || "all";
-    dropdown.value = urlTag;
-    filterPostsByTag(urlTag);
-
-    // On dropdown change: update URL and filter
-    dropdown.addEventListener("change", function () {
-      const selectedTag = this.value;
-      const newURL = new URL(window.location.href);
-      if (selectedTag === "all") {
-        newURL.searchParams.delete("tag");
+      if (selectedTag === 'all' || postTags.includes(selectedTag)) {
+        post.style.display = '';
       } else {
-        newURL.searchParams.set("tag", selectedTag);
+        post.style.display = 'none';
       }
-      window.history.replaceState({}, '', newURL);
-      filterPostsByTag(selectedTag);
     });
   });
+});
 </script>
 
