@@ -44,7 +44,7 @@ permalink: /blog/
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-  const dropdown = document.querySelector('.tag-select');
+  const dropdown = document.querySelector('#tag-select');  // use ID selector
   const posts = document.querySelectorAll('.blog-tile');
 
   dropdown.addEventListener('change', () => {
@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
     posts.forEach(post => {
       const tagsAttr = post.getAttribute('data-tags');
       if (!tagsAttr) return;
-      const postTags = tagsAttr.split(',').map(t => t.trim().toLowerCase());
+      const postTags = tagsAttr.split(' ').map(t => t.trim().toLowerCase()); // split on spaces
 
       if (selectedTag === 'all' || postTags.includes(selectedTag)) {
         post.style.display = '';
