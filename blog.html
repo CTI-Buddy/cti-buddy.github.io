@@ -44,17 +44,36 @@ permalink: /blog/
     const dropdown = document.getElementById("tag-select");
     const posts = document.querySelectorAll(".blog-tile");
 
-    dropdown.addEventListener("change", function () {
-      const selectedTag = this.value;
+    // Helper: get URL param
+    function getURLParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
+    }
 
+    // Filter posts by tag
+    function filterPostsByTag(tag) {
       posts.forEach(post => {
         const postTags = post.getAttribute("data-tags").split(",");
-        if (selectedTag === "all" || postTags.includes(selectedTag)) {
-          post.style.display = "";
-        } else {
-          post.style.display = "none";
-        }
+        post.style.display = (tag === "all" || postTags.includes(tag)) ? "" : "none";
       });
+    }
+
+    // On load: check if tag param exists in URL
+    const urlTag = getURLParam("tag") || "all";
+    dropdown.value = urlTag;
+    filterPostsByTag(urlTag);
+
+    // On dropdown change: update URL and filter
+    dropdown.addEventListener("change", function () {
+      const selectedTag = this.value;
+      const newURL = new URL(window.location.href);
+      if (selectedTag === "all") {
+        newURL.searchParams.delete("tag");
+      } else {
+        newURL.searchParams.set("tag", selectedTag);
+      }
+      window.history.replaceState({}, '', newURL);
+      filterPostsByTag(selectedTag);
     });
   });
 </script>
+
