@@ -1041,6 +1041,17 @@ article.post .post-content {
   margin-bottom: 2rem;
 }
 
+.rss-icon {
+  margin-left: 10px;
+  color: var(--primary);
+  font-size: 1rem;
+  text-decoration: none;
+}
+
+.rss-icon:hover {
+  color: orange;
+}
+
 /* Consistent dropdown styling across browsers */
 #tag-select option {
   background-color: #111111 !important;
