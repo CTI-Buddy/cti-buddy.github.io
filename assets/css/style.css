@@ -1066,9 +1066,27 @@ article.post .post-content {
   }
 
   .nav-links {
+    display: none;
     flex-direction: column;
     width: 100%;
-    margin-top: 1rem;
+    background-color: rgba(10, 10, 10, 0.95);
+    padding: 1rem 0;
+    position: absolute;
+    top: 100%;
+    left: 0;
+  }
+
+  .nav-links.show {
+    display: flex;
+  }
+
+  .hamburger {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: 1.8rem;
+    cursor: pointer;
+    display: block;
   }
 
   .nav-social-dropdown {
@@ -1083,4 +1101,8 @@ article.post .post-content {
   .nav-links {
     margin-left: 4rem; /* Adds spacing between logo and links on larger screens */
   }
+/* Hide hamburger on desktop */
+.hamburger {
+  display: none;
+}
 }
