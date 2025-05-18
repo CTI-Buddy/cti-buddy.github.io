@@ -1078,3 +1078,9 @@ article.post .post-content {
     justify-content: flex-start;
   }
 }
+
+@media (min-width: 768px) {
+  .nav-links {
+    margin-left: 2rem; /* Adds spacing between logo and links on larger screens */
+  }
+}
