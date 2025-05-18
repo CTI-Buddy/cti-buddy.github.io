@@ -2,6 +2,9 @@
   <div class="container">
     <nav>
       <a href="/" class="logo glitch">>_MattySploit<span class="cursor"></span></a>
+      <button class="hamburger" aria-label="Toggle Menu">
+  <i class="fas fa-bars"></i>
+</button>
       <div class="nav-links">
         <a href="https://cti-buddy.github.io/#about">[About]</a>
         <a href="/blog/">[Blog]</a>
@@ -20,5 +23,13 @@
         </div>
       </div>
     </nav>
+<script>
+  const hamburger = document.querySelector('.hamburger');
+  const navLinks = document.querySelector('.nav-links');
+
+  hamburger.addEventListener('click', () => {
+    navLinks.classList.toggle('show');
+  });
+</script>
   </div>
 </header>
