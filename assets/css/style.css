@@ -1099,7 +1099,7 @@ article.post .post-content {
 
 @media (min-width: 768px) {
   .nav-links {
-    margin-left: 4rem; /* Adds spacing between logo and links on larger screens */
+    margin-left: 16rem; /* Adds spacing between logo and links on larger screens */
   }
 /* Hide hamburger on desktop */
 .hamburger {
