@@ -20,6 +20,11 @@
 	.post-content, 
 	.post-content * {
 	  font-family: 'Inter', sans-serif !important;
+		
+	}
+
+	.post-content p {
+	  margin-bottom: 1em; 
 	}
         
         body {
