@@ -980,6 +980,20 @@
   flex-shrink: 0;
 }
 
+pre {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  font-family: Consolas, Monaco, 'Courier New', monospace;
+  font-size: 14px;
+  overflow-x: auto;
+  white-space: pre-wrap; /* Optional: wrap long lines */
+}
+code {
+  font-family: inherit;
+}
+
 /* Date */
 .blog-section .blog-tile .blog-date {
   color: var(--gray);
