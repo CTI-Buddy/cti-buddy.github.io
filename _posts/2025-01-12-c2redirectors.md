@@ -38,11 +38,18 @@ Whereas with a C2 Redirector, the attacker controls the intermediary step and re
 
 Domain Fronting is still a viable technique today, but there's much less availability on the provider side to make it happen.  In April 2018, [Google and Amazon blocked the capability](https://www.bleepingcomputer.com/news/cloud/amazon-follows-google-in-banning-domain-fronting/), though you'll still find some providers out there where it is [still viable](https://blog.compass-security.com/2025/03/bypassing-web-filters-part-3-domain-fronting/).  A twist on the technique, however, is Domain Hiding, as coined by [Erik Huntstad in a DEFCON 28 talk](https://github.com/SixGenInc/Noctilucent).  Domain Hiding uses the quirks of TLS 1.3 to place essentially dummy values in the HTTPS connection's plaintext fields that show up in logs, but the connection's encrypted fields contain the actual connection information.
 
-<p style="text-align:center;">*TLSHost -- microsoft.com (plaintext/visible)*</p>
-<p style="text-align:center;">*SNI -- microsoft.com (plaintext/visible)*</p>
+<table style="border-collapse: collapse; width: 100%;">
+  <thead>
+    <tr>
+      <th style="border: 1px solid #ccc; padding: 8px;"> TLSHost -- microsoft.com (plaintext/visible)</th>
+      <th style="border: 1px solid #ccc; padding: 8px;"> SNI -- microsoft.com (plaintext/visible)</th>
+      <th style="border: 1px solid #ccc; padding: 8px;"> HTTP Host header -- badguyc2.com (encrypted/not visible)</th>
+      <th style="border: 1px solid #ccc; padding: 8px;"> ESNI -- badguyc2.com (encrypted/not visible)</th>
+    </tr>
+  </tbody>
+</table>
+<br />
 
-<p style="text-align:center;">*HTTP Host header -- badguyc2.com (encrypted/not visible)*</p>
-<p style="text-align:center;">*ESNI -- badguyc2.com (encrypted/not visible)*</p>
 
 So again, packet trickery rather than wholesale traffic redirection.  In [Huntstad's use-case](https://youtu.be/TDg092qe50g), this requires DNS record management via Cloudflare in order for it to work, but the actual C2 servers can obviously be hosted anywhere.
 
