@@ -42,16 +42,16 @@ Domain Fronting is still a viable technique today, but there's much less availab
 <table style="border-collapse: collapse; width: 100%;">
   <tbody>
     <tr>
-      <th style="border: 1px solid #ccc; padding: 8px;"> TLSHost -- microsoft.com (plaintext/visible)</th>
+      <td style="border: 1px solid #ccc; padding: 8px;">TLSHost — microsoft.com (plaintext/visible)</td>
     </tr>
     <tr>
-      <td style="border: 1px solid #ccc; padding: 8px;"> SNI -- microsoft.com (plaintext/visible)</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">SNI — microsoft.com (plaintext/visible)</td>
     </tr>
     <tr>
-      <td style="border: 1px solid #ccc; padding: 8px;"> HTTP Host header -- badguyc2.com (encrypted/not visible)</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">HTTP Host header — badguyc2.com (encrypted/not visible)</td>
     </tr>
     <tr>
-      <td style="border: 1px solid #ccc; padding: 8px;"> ESNI -- badguyc2.com (encrypted/not visible)</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">ESNI — badguyc2.com (encrypted/not visible)</td>
     </tr>
   </tbody>
 </table>
