@@ -38,10 +38,10 @@ Whereas with a C2 Redirector, the attacker controls the intermediary step and re
 
 Domain Fronting is still a viable technique today, but there's much less availability on the provider side to make it happen.  In April 2018, [Google and Amazon blocked the capability](https://www.bleepingcomputer.com/news/cloud/amazon-follows-google-in-banning-domain-fronting/), though you'll still find some providers out there where it is [still viable](https://blog.compass-security.com/2025/03/bypassing-web-filters-part-3-domain-fronting/).  A twist on the technique, however, is Domain Hiding, as coined by [Erik Huntstad in a DEFCON 28 talk](https://github.com/SixGenInc/Noctilucent).  Domain Hiding uses the quirks of TLS 1.3 to place essentially dummy values in the HTTPS connection's plaintext fields that show up in logs, but the connection's encrypted fields contain the actual connection information.
 
-<p style="text-align:center;">*TLSHost -- microsoft.com (plaintext/visible)*\</p>
+<p style="text-align:center;">*TLSHost -- microsoft.com (plaintext/visible)*</p>
 <p style="text-align:center;">*SNI -- microsoft.com (plaintext/visible)*</p>
 
-<p style="text-align:center;">*HTTP Host header -- badguyc2.com (encrypted/not visible)*\</p>
+<p style="text-align:center;">*HTTP Host header -- badguyc2.com (encrypted/not visible)*</p>
 <p style="text-align:center;">*ESNI -- badguyc2.com (encrypted/not visible)*</p>
 
 So again, packet trickery rather than wholesale traffic redirection.  In [Huntstad's use-case](https://youtu.be/TDg092qe50g), this requires DNS record management via Cloudflare in order for it to work, but the actual C2 servers can obviously be hosted anywhere.
@@ -51,11 +51,36 @@ So again, packet trickery rather than wholesale traffic redirection.  In [Hunts
 Unrelated!  But also kind of not!  Using an instant messenger's API capability can be utilized as a Domain Fronting technique, but it can also be used as a simple C2 mechanism in itself.  This is where the term conflation can start to get confusing.  If we use [MITRE ATT&CK](https://attack.mitre.org/), we might break it down this way:
 
 
-| ID             | Subtechnique | Name                    | What we’ve discussed          |
-|----------------|--------------|-------------------------|-------------------------------|
-| T1090 - Proxy  | T1090.002    | External Proxy          | C2 Redirector                 |
-| T1090 - Proxy  | T1090.004    | Domain Fronting         | Domain Fronting<br /><br />Domain Hiding (?) |
-| T1102 - Web Service | T1102.002    | Bidirectional Communication | Telegram/Discord C2          |
+<table style="border-collapse: collapse; width: 100%;">
+  <thead>
+    <tr>
+      <th style="border: 1px solid #ccc; padding: 8px;">ID</th>
+      <th style="border: 1px solid #ccc; padding: 8px;">Subtechnique</th>
+      <th style="border: 1px solid #ccc; padding: 8px;">Name</th>
+      <th style="border: 1px solid #ccc; padding: 8px;">What we’ve discussed</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="border: 1px solid #ccc; padding: 8px;">T1090 - Proxy</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">T1090.002</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">External Proxy</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">C2 Redirector</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #ccc; padding: 8px;">T1090 - Proxy</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">T1090.004</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">Domain Fronting</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">Domain Fronting<br /><br />Domain Hiding (?)</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #ccc; padding: 8px;">T1102 - Web Service</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">T1102.002</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">Bidirectional Communication</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">Telegram/Discord C2</td>
+    </tr>
+  </tbody>
+</table>
 
 
 
@@ -162,7 +187,7 @@ Here's a **Blue Team Cheatsheet** section that consolidates the redirector servi
 
 
 * * * * *
-
+<br />
 
 **C2 Redirector Cheatsheet: Pivot Points and Search Starters**
 
@@ -193,7 +218,7 @@ Here are the redirector services we've discussed so far, along with the pivot po
 
 **Sample Splunk Query:**
 
-```
+```spl
 index=proxy OR index=dns
 
 (domain IN ("*.azurefd.net", "*.cloudflareworkers.com", "*.lambda-url.*.on.aws", "*.cloudfunctions.net", "webhook.site", "*.frge.io", "*.epizy.com", "*.rf.gd", "*.dynu.com", "api.mocky.io", "*.pipedream.net", "*.mockbin.org"))
