@@ -174,7 +174,7 @@ One of the first places an analyst might want to start is with frequency analysi
 
 Say you want to hunt for periodic outbound connections that could indicate C2. In Splunk, a simple starting point might look like this:
 
-<pre> ```spl
+<pre><code>
 | tstats count where index=proxy by _time, src, dest
 
 | timechart span=1m count by dest
@@ -184,7 +184,7 @@ Say you want to hunt for periodic outbound connections that could indicate C2. I
 | eval zscore=(count - avg_count)/stdev_count
 
 | where zscore > 3
-```</pre>
+</code></pre>
 
 This query gives you a rough idea of destinations that deviate significantly from their own baseline --- possibly indicating C2 beaconing. You can tweak the threshold or focus by domain type (e.g., .cloudfront.net, .azurefd.net) for more targeted results. Similarly, in Elastic's Kibana, you might use scripted fields to compute connection intervals per host and visualize the regularity of outbound requests. The key here isn't volume---it's *repetition* and *consistency*. Even slow beacons stand out when seen over time.
 
@@ -233,7 +233,7 @@ Here are the redirector services we've discussed so far, along with the pivot po
 
 **Sample Splunk Query:**
 
-```spl
+<pre><code>
 index=proxy OR index=dns
 
 (domain IN ("*.azurefd.net", "*.cloudflareworkers.com", "*.lambda-url.*.on.aws", "*.cloudfunctions.net", "webhook.site", "*.frge.io", "*.epizy.com", "*.rf.gd", "*.dynu.com", "api.mocky.io", "*.pipedream.net", "*.mockbin.org"))
@@ -241,27 +241,27 @@ index=proxy OR index=dns
 | stats count by src_ip, domain, uri_path, user_agent
 
 | where count > 5
-```
+</code></pre>
 
 This gives you a frequency snapshot --- how many times a given IP hit one of these services, with what paths and user-agents. Adjust the threshold (count > 5) depending on your baseline.
 
 **Elastic (Lucene) Query Equivalent:**
 
-```lucene
+<pre><code>
 domain:(*.azurefd.net OR *.cloudflareworkers.com OR *.lambda-url.*.on.aws OR *.cloudfunctions.net OR webhook.site OR *.frge.io OR *.epizy.com OR *.rf.gd OR *.dynu.com OR api.mocky.io OR *.pipedream.net OR *.mockbin.org)
 
 From there, you can build visualizations of request frequency, URI patterns, or anomalies in response sizes.
-```
+</code></pre>
 
 **Google Chronicle YARA-L (for Domain Match):**
 
-```yaral
+<pre><code>
 rule Redirector_Domains {
 
   domain /.*(azurefd\.net|cloudflareworkers\.com|lambda-url.*\.on\.aws|cloudfunctions\.net|webhook\.site|frge\.io|epizy\.com|rf\.gd|dynu\.com|mocky\.io|pipedream\.net|mockbin\.org)/
 
 }
-```
+</code></pre>
 
 **Detection Tips:**
 
