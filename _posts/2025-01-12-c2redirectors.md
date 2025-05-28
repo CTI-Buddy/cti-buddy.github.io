@@ -269,5 +269,7 @@ rule Redirector_Domains {
 -   Cross-pivot: if you see one endpoint beaconing to multiple redirector services, that's often a stronger signal of post-exploitation traffic.
 -   Inspect **JA3 or JA3S fingerprints** (if available): adversaries often reuse similar TLS profiles when standing up redirectors.
 -   Apply a **known-good allowlist**: filter out known legitimate internal or dev use of services like Pipedream or Mocky so you're not chasing dev noise.
+
 <br />
+
 Keep in mind --- this doesn't catch everything, and by the time you're seeing redirector traffic, the initial foothold may have already been gained. But it gives you a lens into C2 staging activity, and more importantly, it gives you a chance to force attackers into noisier, more detectable infrastructure if they're forced to rotate off these services.
