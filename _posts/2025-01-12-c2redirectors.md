@@ -249,9 +249,9 @@ This gives you a frequency snapshot --- how many times a given IP hit one of the
 
 <pre><code>
 domain:(*.azurefd.net OR *.cloudflareworkers.com OR *.lambda-url.*.on.aws OR *.cloudfunctions.net OR webhook.site OR *.frge.io OR *.epizy.com OR *.rf.gd OR *.dynu.com OR api.mocky.io OR *.pipedream.net OR *.mockbin.org)
+</code></pre>
 
 From there, you can build visualizations of request frequency, URI patterns, or anomalies in response sizes.
-</code></pre>
 
 **Google Chronicle YARA-L (for Domain Match):**
 
