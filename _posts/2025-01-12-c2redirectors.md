@@ -81,7 +81,7 @@ Unrelated!  But also kind of not!  Using an instant messenger's API capability
     </tr>
   </tbody>
 </table>
-
+<br />
 
 
 But that isn't perfect either.  A C2 Redirector could be considered a mechanism of Bidirectional Communication, just as Telegram/Discord C2 could just be a Domain Fronting technique, depending on configuration.  Domain Hiding doesn't have a specific label, so there isn't really a way to cleanly categorize it -- though it probably fits best as a variation of Domain Fronting considering the packet customization as the method of redirect rather than the wholesale traffic forwarding that occurs in a C2 Redirector.
@@ -159,7 +159,7 @@ One of the first places an analyst might want to start is with frequency analysi
 
 Say you want to hunt for periodic outbound connections that could indicate C2. In Splunk, a simple starting point might look like this:
 
-```
+```spl
 | tstats count where index=proxy by _time, src, dest
 
 | timechart span=1m count by dest
@@ -185,7 +185,7 @@ At the end of the day, you're not trying to flag all C2 redirectors. You're tryi
 
 Here's a **Blue Team Cheatsheet** section that consolidates the redirector services I've covered (Azure FrontDoor, Cloudflare Workers, AWS Lambda, Google Cloud, the rest) and frames out how an analyst can start building detection queries in Splunk, Elastic, or Chronicle. It focuses on the *how* and *why*, not just throwing regex at a wall.
 
-
+<br />
 * * * * *
 <br />
 
@@ -208,7 +208,7 @@ Here are the redirector services we've discussed so far, along with the pivot po
 -   api.mocky.io → Mocky HTTP response mocking
 -   *.pipedream.net → Pipedream integration endpoints
 -   *.mockbin.org → Mockbin response generator
-
+<br />
 
 **Log Sources to Pivot From:**
 
@@ -232,7 +232,7 @@ This gives you a frequency snapshot --- how many times a given IP hit one of the
 
 **Elastic (Lucene) Query Equivalent:**
 
-```
+```lucene
 domain:(*.azurefd.net OR *.cloudflareworkers.com OR *.lambda-url.*.on.aws OR *.cloudfunctions.net OR webhook.site OR *.frge.io OR *.epizy.com OR *.rf.gd OR *.dynu.com OR api.mocky.io OR *.pipedream.net OR *.mockbin.org)
 
 From there, you can build visualizations of request frequency, URI patterns, or anomalies in response sizes.
@@ -240,7 +240,7 @@ From there, you can build visualizations of request frequency, URI patterns, or 
 
 **Google Chronicle YARA-L (for Domain Match):**
 
-```
+```yaral
 rule Redirector_Domains {
 
   domain /.*(azurefd\.net|cloudflareworkers\.com|lambda-url.*\.on\.aws|cloudfunctions\.net|webhook\.site|frge\.io|epizy\.com|rf\.gd|dynu\.com|mocky\.io|pipedream\.net|mockbin\.org)/
@@ -254,5 +254,5 @@ rule Redirector_Domains {
 -   Cross-pivot: if you see one endpoint beaconing to multiple redirector services, that's often a stronger signal of post-exploitation traffic.
 -   Inspect **JA3 or JA3S fingerprints** (if available): adversaries often reuse similar TLS profiles when standing up redirectors.
 -   Apply a **known-good allowlist**: filter out known legitimate internal or dev use of services like Pipedream or Mocky so you're not chasing dev noise.
-
+<br />
 Keep in mind --- this doesn't catch everything, and by the time you're seeing redirector traffic, the initial foothold may have already been gained. But it gives you a lens into C2 staging activity, and more importantly, it gives you a chance to force attackers into noisier, more detectable infrastructure if they're forced to rotate off these services.
