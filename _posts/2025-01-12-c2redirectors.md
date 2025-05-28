@@ -17,7 +17,7 @@ So to kick this blog off, I thought I'd try and provide a definitive guide for C
 
 In short, a C2 Redirector functions as an intermediate step in traditional C2 traffic as a means of hiding or obfuscating what would otherwise be more detectable for a defender.  Essentially, C2 traffic that would otherwise frequently connect to <imabadyguy.xyz> will instead jump through a more legitimate looking domain like <im-a-good-guy-d8eigjaek3i09.z02.azurefd.net> before forwarding that traffic through to <imabadguy.xyz>.  This is handy for an attacker, because it blends in better with normal traffic, uses a trusted domain (in this case, Azure's CDN), and in more sophisticated schemes, can alternate between a few different Redirectors to avoid frequency patterning the traffic.
 
-![image](https://github.com/user-attachments/assets/e410c5d7-411b-4f25-957b-1f642d3cf0c3)
+<p style="text-align:center;">![image](https://github.com/user-attachments/assets/e410c5d7-411b-4f25-957b-1f642d3cf0c3)</p>
 
 
 **C2 Redirector versus Domain Fronting**
@@ -26,7 +26,7 @@ Okay so is this different from Domain Fronting?  Yes, kind of.  Enough so that
 
 What's the difference? It mostly comes down to packet trickery. In Domain Fronting, the TLS SNI (Server Name Indication) field shows a legit front domain (e.g., [allowed.example)](http://www.google.com)/), but the Host header in the HTTP request is actually pointing to the C2 server (forbidden.example). 
 
-![image](https://github.com/user-attachments/assets/b248018d-2a61-4117-91a9-b95d9289d135)
+<p style="text-align:center;">![image](https://github.com/user-attachments/assets/b248018d-2a61-4117-91a9-b95d9289d135)</p>
 
 
 Whereas with a C2 Redirector, the attacker controls the intermediary step and redirects the traffic onward to the C2 server.
@@ -35,11 +35,11 @@ Whereas with a C2 Redirector, the attacker controls the intermediary step and re
 
 Domain Fronting is still a viable technique today, but there's much less availability on the provider side to make it happen.  In April 2018, [Google and Amazon blocked the capability](https://www.bleepingcomputer.com/news/cloud/amazon-follows-google-in-banning-domain-fronting/), though you'll still find some providers out there where it is [still viable](https://blog.compass-security.com/2025/03/bypassing-web-filters-part-3-domain-fronting/).  A twist on the technique, however, is Domain Hiding, as coined by [Erik Huntstad in a DEFCON 28 talk](https://github.com/SixGenInc/Noctilucent).  Domain Hiding uses the quirks of TLS 1.3 to place essentially dummy values in the HTTPS connection's plaintext fields that show up in logs, but the connection's encrypted fields contain the actual connection information.
 
-*TLSHost -- microsoft.com (plaintext/visible)*\
-*SNI -- microsoft.com (plaintext/visible)*
+<p style="text-align:center;">*TLSHost -- microsoft.com (plaintext/visible)*\</p>
+<p style="text-align:center;">*SNI -- microsoft.com (plaintext/visible)*</p>
 
-*HTTP Host header -- badguyc2.com (encrypted/not visible)*\
-*ESNI -- badguyc2.com (encrypted/not visible)*
+<p style="text-align:center;">*HTTP Host header -- badguyc2.com (encrypted/not visible)*\</p>
+<p style="text-align:center;">*ESNI -- badguyc2.com (encrypted/not visible)*</p>
 
 So again, packet trickery rather than wholesale traffic redirection.  In [Huntstad's use-case](https://youtu.be/TDg092qe50g), this requires DNS record management via Cloudflare in order for it to work, but the actual C2 servers can obviously be hosted anywhere.
 
@@ -47,72 +47,13 @@ So again, packet trickery rather than wholesale traffic redirection.  In [Hunts
 
 Unrelated!  But also kind of not!  Using an instant messenger's API capability can be utilized as a Domain Fronting technique, but it can also be used as a simple C2 mechanism in itself.  This is where the term conflation can start to get confusing.  If we use [MITRE ATT&CK](https://attack.mitre.org/), we might break it down this way:
 
-|
-
-ID
-
- |
-
-Subtechnique
-
- |
-
-Name
-
- |
-
-What we've discussed
-
- |
-|
-
-T1090 - Proxy
-
- |
-
-T1090.002
-
- |
-
-External Proxy
-
- |
-
-C2 Redirector
-
- |
-|
-
-T1090.004
-
- |
-
-Domain Fronting
-
- |
-
-Domain Fronting
-
-Domain Hiding(?)
-
- |
-|
-
-T1102 -- Web Service
-
- |
-
-T1102.002
-
- |
-
-Bidirectional Communication
-
- |
-
-Telegram/Discord C2
-
- |
+<p style="text-align:center;">
+| ID  | Subtechnique | Name | What we’ve discussed |
+| --- | --- | --- | --- |
+| T1090 - Proxy | T1090.002 | External Proxy | C2 Redirector |
+| T1090.004 | Domain Fronting | Domain Fronting<br><br>Domain Hiding(?) |
+| T1102 – Web Service | T1102.002 | Bidirectional Communication | Telegram/Discord C2 |
+</p>
 
 But that isn't perfect either.  A C2 Redirector could be considered a mechanism of Bidirectional Communication, just as Telegram/Discord C2 could just be a Domain Fronting technique, depending on configuration.  Domain Hiding doesn't have a specific label, so there isn't really a way to cleanly categorize it -- though it probably fits best as a variation of Domain Fronting considering the packet customization as the method of redirect rather than the wholesale traffic forwarding that occurs in a C2 Redirector.
 
@@ -122,44 +63,44 @@ The conflation could probably be it's own post.. anyway.
 
 Let's talk about some common ways to set up and use a C2 Redirector.  Much of this has been individually better covered elsewhere, so I'll link to those posts from better authors and give a more high level summary of each, as well as cut to the chase regarding what those domains may look like for hunting.  This is not all-encompassing and there are other clever ways to do this, but this allows us to look at some of the larger solutions that are probably more likely to be seen at scale.  This will set us up to craft some querying and searches that lean on C2's general dependence on persistence and periodicity (even if obfuscated) to drill down on some suspect traffic.
 
-**Azure FrontDoor CDN**
+***Azure FrontDoor CDN***
 
 My hypothetical above was Azure so we might as well start with Azure.  I really like the [write-up from r3d-buck3t](https://medium.com/r3d-buck3t/red-teaming-in-cloud-leverage-azure-frontdoor-cdn-for-c2-redirectors-79dd9ca98178) that explains this use-case better than I could.  In short, this is essentially accomplished via enabling Microsoft.CDN Provider and then configuring some VM firewalls... and it can be done within a free Azure trial.  This method also allows for creation of azurefd subdomains for further obfuscation, though directing this through Azure FrontDoor but with a custom domain is doable as well.  In short, it's relatively easy, simple, and uses Microsoft infrastructure.
 
 Azure FrontDoor has long been a favorite among adversaries looking to blend malicious traffic into the background hum of enterprise cloud chatter. It's fast, flexible, and (perhaps most importantly) carries Microsoft's implied legitimacy in the eyes of most firewall and proxy logs. Attackers tend to spin up temporary custom subdomains within the AzureFD namespace, attach them to a Front Door instance, and configure that instance to forward traffic onto a backend C2 server. What makes this effective isn't just the hiding in plain sight aspect, it's also the caching, routing, and WAF capabilities that, when misused, can obscure fingerprinting or mislead defenders into thinking traffic is heading to a benign cloud workload.
 
-![image](https://github.com/user-attachments/assets/6a9adf73-4eb8-4e6c-8fad-ebc00efcca53)
+<p style="text-align:center;">![image](https://github.com/user-attachments/assets/6a9adf73-4eb8-4e6c-8fad-ebc00efcca53)</p>
 
 
 What's notable from a detection perspective is that most AzureFD URLs follow a somewhat predictable naming structure, often ending in .azurefd.net or .trafficmanager.net, and typically resolve to Azure's IP space. Obviously, part of it's allure as a viable C2 Redirector is that legitimate orgs use these same domains too. That said, the key isn't in the domain itself, but in the context: are you seeing regular beaconing to a random Azure subdomain that doesn't appear anywhere in your inventory or vendor list? Is that domain relatively new, with a high connection frequency but a low volume of data transfer? These are small flags, but they can be used to bubble up interesting leads.
 
-**Cloudflare Workers**
+***Cloudflare Workers***
 
 Things will start looking similar very quickly now, as each of these solutions basically offer the same perks -- free or low cost traffic redirection and the trust level of an otherwise legitimate domain.  [Alfie Champion's post here](https://ajpc500.github.io/c2/Using-CloudFlare-Workers-as-Redirectors/) describes the use-case utilizing Cloudflare's workers.dev domain to essentially accomplish the same thing.
 
 Cloudflare Workers offer another compelling redirector option, largely because they allow an attacker to effectively write and deploy lightweight JavaScript that handles traffic directly at the edge. In this case, the attacker sets up a Worker that listens on a Cloudflare-served domain and proxies or forwards traffic to the real C2 server. Unlike traditional redirectors which might rely on simple HTTP forwarding or 302s, Workers can inspect, modify, and reshape the request before passing it along---or even embed a full client-side logic to perform decision-based redirection.
 
-![image](https://github.com/user-attachments/assets/2c5b9a00-674b-4def-a4e6-6c044f55fdf9)
+<p style="text-align:center;">![image](https://github.com/user-attachments/assets/2c5b9a00-674b-4def-a4e6-6c044f55fdf9)</p>
 
 
 From a defender's viewpoint, this one's especially annoying. The TLS cert is legit. The domain is served from Cloudflare's anycast edge nodes. And because Workers run serverless, there's no traditional infrastructure to enumerate or scan. That said, hunting still isn't impossible. Workers-based redirectors tend to be high-frequency but low-volume---think regular check-ins with little payload. They may also show up as subdomains with no public presence, no SPF/DKIM records, and no backlinks. DNS over time and connection frequency analysis can help here, as can paying close attention to HTTP headers that deviate slightly from the norm (e.g., odd user-agents, no referrers, or uncommon methods).
 
-**AWS Lambda**
+***AWS Lambda***
 
 AWS Lambda redirectors usually come in two flavors: either they're behind an API Gateway or served directly through custom domain integration. In both cases, the concept is the same: requests hit the Lambda endpoint, which executes a small chunk of code that does some quick logic and then passes the connection on to the C2 server. These setups are particularly attractive to red teams because they can spin up infrastructure only when needed, keeping logs minimal and reducing the infrastructure's overall fingerprint.  [Adam Chester has a great writeup here](https://blog.xpnsec.com/aws-lambda-redirector/).
 
-![image](https://github.com/user-attachments/assets/47a45f2d-66c4-4ec4-9277-b50796d5294f)
+<p style="text-align:center;">![image](https://github.com/user-attachments/assets/47a45f2d-66c4-4ec4-9277-b50796d5294f)</p>
 
 
 From the blue team's angle, Lambda-based redirectors can often look like strange spikes of activity to AWS API endpoints that don't seem to correspond to any deployed application internally. If your organization doesn't use Lambda or API Gateway, this is easier to spot---but for those that do, anomaly detection gets harder. One thing to watch for: Lambda endpoints tend to follow region-specific URL structures (<random>.execute-api.<region>.amazonaws.com). If you're seeing beacon-style traffic to these, it might be worth checking if the endpoint corresponds to an actual internal function or someone else's Lambda quietly relaying commands.
 
-**Google Cloud**
+***Google Cloud***
 
 Google Cloud Platform (GCP) options for redirectors are a bit more varied---App Engine, Cloud Run, Firebase Hosting, or even simple Google Sites pages have all been seen in the wild as makeshift redirectors. The flexibility and generous free tiers make these appealing for low-cost and high-durability redirection. App Engine and Cloud Run, in particular, can host small services that behave just like a redirector with very little effort, and---just like the other cloud providers---come with the bonus of Google's implied trust.  [CTFIOT has a writeup here (this is mostly in Chinese fwiw).](https://www.ctfiot.com/108324.html)
 
 Detection here hinges on knowing what Google-hosted services are in use internally. If you're not using Firebase or App Engine, and yet you see persistent connections to *.appspot.com, *.cloudfunctions.net or *.firebaseapp.com, that's something to investigate. Google's infrastructure also shares IPs across tenants, making passive DNS tracking less useful. Instead, defenders can lean on behavioral analysis: is this domain newly registered? Has it changed its hosting recently? Does the traffic have unusual timing patterns that suggest polling behavior? And again, headers can be revealing if anything looks hand-rolled or stripped down beyond typical browser-based use.
 
-**Redirectors in the Wild: The Lesser-Known Services that Show Up in Campaigns**\
+***Redirectors in the Wild: The Lesser-Known Services that Show Up in Campaigns***\
 While enterprise-grade infrastructure like Azure FrontDoor, Cloudflare Workers, or AWS Lambda often get most of the attention when it comes to redirector setups, it's worth noting that there's a whole cottage industry of simpler, more disposable services that see frequent use in red team ops and real-world threat activity alike. These services aren't always designed with redirection in mind---but they can be easily co-opted for it. They're quick to spin up, rarely inspected closely, and often fly under the radar in most orgs' logging posture.
 
 Take **Webhook[.]site**, for instance. It's built to let developers quickly test and capture HTTP requests --- but that same functionality means an actor can point a payload to a webhook endpoint that relays or logs traffic. If the webhook forwards the request or responds in a controlled way, it can serve as a stealthy handoff to a real C2 server. Similar logic applies to **FrgeIO**, which offers temporary API endpoints for demo and development use. These endpoints may appear totally benign to casual inspection and usually aren't included in threat feeds, meaning traffic to them rarely raises alarms unless you're actively hunting for oddities.
@@ -180,10 +121,7 @@ One of the first places an analyst might want to start is with frequency analysi
 **Beaconing Analysis in Practice**\
 Say you want to hunt for periodic outbound connections that could indicate C2. In Splunk, a simple starting point might look like this:
 
-spl
-
-CopyEdit
-
+```
 | tstats count where index=proxy by _time, src, dest
 
 | timechart span=1m count by dest
@@ -193,6 +131,7 @@ CopyEdit
 | eval zscore=(count - avg_count)/stdev_count
 
 | where zscore > 3
+```
 
 This query gives you a rough idea of destinations that deviate significantly from their own baseline --- possibly indicating C2 beaconing. You can tweak the threshold or focus by domain type (e.g., .cloudfront.net, .azurefd.net) for more targeted results. Similarly, in Elastic's Kibana, you might use scripted fields to compute connection intervals per host and visualize the regularity of outbound requests. The key here isn't volume---it's *repetition* and *consistency*. Even slow beacons stand out when seen over time.
 
@@ -206,7 +145,9 @@ At the end of the day, you're not trying to flag all C2 redirectors. You're tryi
 
 Here's a **Blue Team Cheatsheet** section that consolidates the redirector services I've covered (Azure FrontDoor, Cloudflare Workers, AWS Lambda, Google Cloud, the rest) and frames out how an analyst can start building detection queries in Splunk, Elastic, or Chronicle. It focuses on the *how* and *why*, not just throwing regex at a wall.
 
+
 * * * * *
+
 
 **C2 Redirector Cheatsheet: Pivot Points and Search Starters**\
 So what do you actually search for when you suspect redirector use, or when you just want to go hunting? A lot of redirector infrastructure won't show up in traditional threat intel feeds. But the nature of how C2 works means it usually gives itself away in volume, repetition, or timing --- even if the destination is cloud-hosted and the traffic is encrypted. You're not always looking for a smoking gun. Sometimes you're just looking for a slightly warm barrel.
@@ -234,7 +175,7 @@ Here are the redirector services we've discussed so far, along with the pivot po
 -   HTTP logs (Chronicle, Zeek, etc.): Look for repeated POST or GET traffic to these hosts, especially with unusual URI paths or consistent beaconing intervals.
 
 **Sample Splunk Query:**
-
+```
 index=proxy OR index=dns
 
 (domain IN ("*.azurefd.net", "*.cloudflareworkers.com", "*.lambda-url.*.on.aws", "*.cloudfunctions.net", "webhook.site", "*.frge.io", "*.epizy.com", "*.rf.gd", "*.dynu.com", "api.mocky.io", "*.pipedream.net", "*.mockbin.org"))
@@ -242,22 +183,25 @@ index=proxy OR index=dns
 | stats count by src_ip, domain, uri_path, user_agent
 
 | where count > 5
+```
 
 This gives you a frequency snapshot --- how many times a given IP hit one of these services, with what paths and user-agents. Adjust the threshold (count > 5) depending on your baseline.
 
 **Elastic (Lucene) Query Equivalent:**
-
+```
 domain:(*.azurefd.net OR *.cloudflareworkers.com OR *.lambda-url.*.on.aws OR *.cloudfunctions.net OR webhook.site OR *.frge.io OR *.epizy.com OR *.rf.gd OR *.dynu.com OR api.mocky.io OR *.pipedream.net OR *.mockbin.org)
 
 From there, you can build visualizations of request frequency, URI patterns, or anomalies in response sizes.
+```
 
 **Google Chronicle YARA-L (for Domain Match):**
-
+```
 rule Redirector_Domains {
 
   domain /.*(azurefd\.net|cloudflareworkers\.com|lambda-url.*\.on\.aws|cloudfunctions\.net|webhook\.site|frge\.io|epizy\.com|rf\.gd|dynu\.com|mocky\.io|pipedream\.net|mockbin\.org)/
 
 }
+```
 
 **Detection Tips:**
 
