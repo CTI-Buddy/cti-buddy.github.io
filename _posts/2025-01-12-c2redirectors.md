@@ -17,8 +17,9 @@ So to kick this blog off, I thought I'd try and provide a definitive guide for C
 
 In short, a C2 Redirector functions as an intermediate step in traditional C2 traffic as a means of hiding or obfuscating what would otherwise be more detectable for a defender.  Essentially, C2 traffic that would otherwise frequently connect to <imabadyguy.xyz> will instead jump through a more legitimate looking domain like <im-a-good-guy-d8eigjaek3i09.z02.azurefd.net> before forwarding that traffic through to <imabadguy.xyz>.  This is handy for an attacker, because it blends in better with normal traffic, uses a trusted domain (in this case, Azure's CDN), and in more sophisticated schemes, can alternate between a few different Redirectors to avoid frequency patterning the traffic.
 
-<p align="center">[image](https://github.com/user-attachments/assets/e410c5d7-411b-4f25-957b-1f642d3cf0c3)</p>
-
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/e410c5d7-411b-4f25-957b-1f642d3cf0c3" alt="image">
+</p>
 
 **C2 Redirector versus Domain Fronting**
 
@@ -26,7 +27,9 @@ Okay so is this different from Domain Fronting?  Yes, kind of.  Enough so that
 
 What's the difference? It mostly comes down to packet trickery. In Domain Fronting, the TLS SNI (Server Name Indication) field shows a legit front domain (e.g., [allowed.example)](http://www.google.com)/), but the Host header in the HTTP request is actually pointing to the C2 server (forbidden.example). 
 
-<p align="center">![image](https://github.com/user-attachments/assets/b248018d-2a61-4117-91a9-b95d9289d135)</p>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/b248018d-2a61-4117-91a9-b95d9289d135" alt="image">
+</p>
 
 
 Whereas with a C2 Redirector, the attacker controls the intermediary step and redirects the traffic onward to the C2 server.
@@ -69,7 +72,9 @@ My hypothetical above was Azure so we might as well start with Azure.  I really
 
 Azure FrontDoor has long been a favorite among adversaries looking to blend malicious traffic into the background hum of enterprise cloud chatter. It's fast, flexible, and (perhaps most importantly) carries Microsoft's implied legitimacy in the eyes of most firewall and proxy logs. Attackers tend to spin up temporary custom subdomains within the AzureFD namespace, attach them to a Front Door instance, and configure that instance to forward traffic onto a backend C2 server. What makes this effective isn't just the hiding in plain sight aspect, it's also the caching, routing, and WAF capabilities that, when misused, can obscure fingerprinting or mislead defenders into thinking traffic is heading to a benign cloud workload.
 
-<p align="center">![image](https://github.com/user-attachments/assets/6a9adf73-4eb8-4e6c-8fad-ebc00efcca53)</p>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/6a9adf73-4eb8-4e6c-8fad-ebc00efcca53" alt="image">
+</p>
 
 
 What's notable from a detection perspective is that most AzureFD URLs follow a somewhat predictable naming structure, often ending in .azurefd.net or .trafficmanager.net, and typically resolve to Azure's IP space. Obviously, part of it's allure as a viable C2 Redirector is that legitimate orgs use these same domains too. That said, the key isn't in the domain itself, but in the context: are you seeing regular beaconing to a random Azure subdomain that doesn't appear anywhere in your inventory or vendor list? Is that domain relatively new, with a high connection frequency but a low volume of data transfer? These are small flags, but they can be used to bubble up interesting leads.
@@ -80,7 +85,9 @@ Things will start looking similar very quickly now, as each of these solutions b
 
 Cloudflare Workers offer another compelling redirector option, largely because they allow an attacker to effectively write and deploy lightweight JavaScript that handles traffic directly at the edge. In this case, the attacker sets up a Worker that listens on a Cloudflare-served domain and proxies or forwards traffic to the real C2 server. Unlike traditional redirectors which might rely on simple HTTP forwarding or 302s, Workers can inspect, modify, and reshape the request before passing it along---or even embed a full client-side logic to perform decision-based redirection.
 
-<p align="center">![image](https://github.com/user-attachments/assets/2c5b9a00-674b-4def-a4e6-6c044f55fdf9)</p>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/2c5b9a00-674b-4def-a4e6-6c044f55fdf9" alt="image">
+</p>
 
 
 From a defender's viewpoint, this one's especially annoying. The TLS cert is legit. The domain is served from Cloudflare's anycast edge nodes. And because Workers run serverless, there's no traditional infrastructure to enumerate or scan. That said, hunting still isn't impossible. Workers-based redirectors tend to be high-frequency but low-volume---think regular check-ins with little payload. They may also show up as subdomains with no public presence, no SPF/DKIM records, and no backlinks. DNS over time and connection frequency analysis can help here, as can paying close attention to HTTP headers that deviate slightly from the norm (e.g., odd user-agents, no referrers, or uncommon methods).
@@ -89,7 +96,9 @@ From a defender's viewpoint, this one's especially annoying. The TLS cert is leg
 
 AWS Lambda redirectors usually come in two flavors: either they're behind an API Gateway or served directly through custom domain integration. In both cases, the concept is the same: requests hit the Lambda endpoint, which executes a small chunk of code that does some quick logic and then passes the connection on to the C2 server. These setups are particularly attractive to red teams because they can spin up infrastructure only when needed, keeping logs minimal and reducing the infrastructure's overall fingerprint.  [Adam Chester has a great writeup here](https://blog.xpnsec.com/aws-lambda-redirector/).
 
-<p align="center">![image](https://github.com/user-attachments/assets/47a45f2d-66c4-4ec4-9277-b50796d5294f)</p>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/47a45f2d-66c4-4ec4-9277-b50796d5294f" alt="image">
+</p>
 
 
 From the blue team's angle, Lambda-based redirectors can often look like strange spikes of activity to AWS API endpoints that don't seem to correspond to any deployed application internally. If your organization doesn't use Lambda or API Gateway, this is easier to spot---but for those that do, anomaly detection gets harder. One thing to watch for: Lambda endpoints tend to follow region-specific URL structures (<random>.execute-api.<region>.amazonaws.com). If you're seeing beacon-style traffic to these, it might be worth checking if the endpoint corresponds to an actual internal function or someone else's Lambda quietly relaying commands.
