@@ -231,7 +231,10 @@ Here are the redirector services we've discussed so far, along with the pivot po
 -   DNS logs: Filter by query or domain fields for the above indicators. Use wildcard matches if supported.
 -   Proxy logs: Look at url, referrer, and user-agent fields. Atypical user-agents making repeated requests to these domains can signal abuse.
 -   HTTP logs (Chronicle, Zeek, etc.): Look for repeated POST or GET traffic to these hosts, especially with unusual URI paths or consistent beaconing intervals.
+
 <br />
+<br />
+
 **Sample Splunk Query:**
 
 <pre><code>
