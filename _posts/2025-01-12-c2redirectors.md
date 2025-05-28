@@ -233,7 +233,7 @@ Here are the redirector services we've discussed so far, along with the pivot po
 -   HTTP logs (Chronicle, Zeek, etc.): Look for repeated POST or GET traffic to these hosts, especially with unusual URI paths or consistent beaconing intervals.
 
 <br />
-<br />
+
 
 **Sample Splunk Query:**
 
@@ -248,6 +248,7 @@ index=proxy OR index=dns
 </code></pre>
 
 This gives you a frequency snapshot --- how many times a given IP hit one of these services, with what paths and user-agents. Adjust the threshold (count > 5) depending on your baseline.
+<br />
 
 **Elastic (Lucene) Query Equivalent:**
 
@@ -257,6 +258,7 @@ domain:(*.azurefd.net OR *.cloudflareworkers.com OR *.lambda-url.*.on.aws OR *.c
 
 From there, you can build visualizations of request frequency, URI patterns, or anomalies in response sizes.
 
+<br />
 **Google Chronicle YARA-L (for Domain Match):**
 
 <pre><code>
