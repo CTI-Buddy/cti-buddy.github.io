@@ -57,7 +57,7 @@ Domain Fronting is still a viable technique today, but there's much less availab
     </tbody>
   </table>
 </div>
-
+<br />
 
 So again, packet trickery rather than wholesale traffic redirection.  In [Huntstad's use-case](https://youtu.be/TDg092qe50g), this requires DNS record management via Cloudflare in order for it to work, but the actual C2 servers can obviously be hosted anywhere.
 
@@ -174,7 +174,7 @@ One of the first places an analyst might want to start is with frequency analysi
 
 Say you want to hunt for periodic outbound connections that could indicate C2. In Splunk, a simple starting point might look like this:
 
-```spl
+<pre> ```spl
 | tstats count where index=proxy by _time, src, dest
 
 | timechart span=1m count by dest
@@ -184,7 +184,7 @@ Say you want to hunt for periodic outbound connections that could indicate C2. I
 | eval zscore=(count - avg_count)/stdev_count
 
 | where zscore > 3
-```
+```</pre>
 
 This query gives you a rough idea of destinations that deviate significantly from their own baseline --- possibly indicating C2 beaconing. You can tweak the threshold or focus by domain type (e.g., .cloudfront.net, .azurefd.net) for more targeted results. Similarly, in Elastic's Kibana, you might use scripted fields to compute connection intervals per host and visualize the regularity of outbound requests. The key here isn't volume---it's *repetition* and *consistency*. Even slow beacons stand out when seen over time.
 
