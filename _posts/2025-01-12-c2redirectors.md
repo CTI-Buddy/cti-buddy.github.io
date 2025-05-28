@@ -101,6 +101,7 @@ Google Cloud Platform (GCP) options for redirectors are a bit more varied---App 
 Detection here hinges on knowing what Google-hosted services are in use internally. If you're not using Firebase or App Engine, and yet you see persistent connections to *.appspot.com, *.cloudfunctions.net or *.firebaseapp.com, that's something to investigate. Google's infrastructure also shares IPs across tenants, making passive DNS tracking less useful. Instead, defenders can lean on behavioral analysis: is this domain newly registered? Has it changed its hosting recently? Does the traffic have unusual timing patterns that suggest polling behavior? And again, headers can be revealing if anything looks hand-rolled or stripped down beyond typical browser-based use.
 
 ***Redirectors in the Wild: The Lesser-Known Services that Show Up in Campaigns***\
+
 While enterprise-grade infrastructure like Azure FrontDoor, Cloudflare Workers, or AWS Lambda often get most of the attention when it comes to redirector setups, it's worth noting that there's a whole cottage industry of simpler, more disposable services that see frequent use in red team ops and real-world threat activity alike. These services aren't always designed with redirection in mind---but they can be easily co-opted for it. They're quick to spin up, rarely inspected closely, and often fly under the radar in most orgs' logging posture.
 
 Take **Webhook[.]site**, for instance. It's built to let developers quickly test and capture HTTP requests --- but that same functionality means an actor can point a payload to a webhook endpoint that relays or logs traffic. If the webhook forwards the request or responds in a controlled way, it can serve as a stealthy handoff to a real C2 server. Similar logic applies to **FrgeIO**, which offers temporary API endpoints for demo and development use. These endpoints may appear totally benign to casual inspection and usually aren't included in threat feeds, meaning traffic to them rarely raises alarms unless you're actively hunting for oddities.
@@ -114,11 +115,13 @@ Other redirection-friendly platforms include **Mocky**, **Mockbin[.]org**, and *
 The throughline with all of these platforms is this: the simpler and more disposable the redirector, the more likely it is to go unnoticed. Many of these services are essentially pre-configured redirect platforms without needing to stand up infrastructure yourself. From a detection standpoint, they exist in a gray area---often hosted on trusted clouds, appearing legitimate at a glance, and unlikely to show up in any IOC feed until long after they've served their purpose. Which is all the more reason they deserve to be on the blue team's radar.
 
 **Hunting the Anomalous: Detection Through Behavior, Not Signature**\
+
 When it comes to catching C2 redirectors in the wild, it's important to accept up front that you're rarely going to catch them through traditional signature-based detection. There's no magic domain, IP, or ASN that'll give it away --- especially if the redirector is hosted on a major cloud provider. What *can* tip your hand, though, is behavioral anomaly detection and pattern-of-life analysis. Redirectors still behave like C2: they beacon. They check in regularly. They have a rhythm, even if it's intentionally jittered.
 
 One of the first places an analyst might want to start is with frequency analysis --- how often a host is reaching out to a domain over time. C2 tends to involve repeated, low-volume traffic to a small set of external hosts, usually at regular intervals. Even when jitter is introduced, statistical models can surface those patterns. In Splunk, you might use tstats to baseline DNS or proxy traffic over a 24--72 hour period and calculate the standard deviation of connection intervals. In Elastic, you'd lean into aggregations and visualizations --- using date histograms to bucket communication patterns and identify outliers. Chronicle can be particularly effective here, with its entity-based timeline views and automatic enrichment allowing for quick correlation between destination domains, hosting infrastructure, and behavioral timelines.
 
 **Beaconing Analysis in Practice**\
+
 Say you want to hunt for periodic outbound connections that could indicate C2. In Splunk, a simple starting point might look like this:
 
 ```
@@ -136,11 +139,13 @@ Say you want to hunt for periodic outbound connections that could indicate C2. I
 This query gives you a rough idea of destinations that deviate significantly from their own baseline --- possibly indicating C2 beaconing. You can tweak the threshold or focus by domain type (e.g., .cloudfront.net, .azurefd.net) for more targeted results. Similarly, in Elastic's Kibana, you might use scripted fields to compute connection intervals per host and visualize the regularity of outbound requests. The key here isn't volume---it's *repetition* and *consistency*. Even slow beacons stand out when seen over time.
 
 **Contextual Enrichment and Cross-Correlation**\
+
 Of course, a domain beaconing every hour isn't *inherently* malicious---maybe it's just a software updater. That's where enrichment comes in. Chronicle's strength lies in its ability to automatically tie domains to WHOIS data, passive DNS, and even third-party threat intel. Splunk and Elastic can get there too with the right integrations (VirusTotal, AbuseIPDB, internal asset inventories). Cross-referencing destinations against known business applications, or labeling internal assets by role (e.g., user laptop vs. internal server) can drastically improve your signal-to-noise ratio. Why is this finance user's laptop beaconing to an AWS Lambda API endpoint in the eu-west-1 region every 90 seconds, when nobody else in finance has ever talked to that service?
 
 Another underrated tactic: look for *low-diversity communication patterns*. Redirectors, by nature, are often one-to-one: a single endpoint beaconing to a single hostname or IP with little deviation. In contrast, legitimate apps usually speak to several subdomains, APIs, or CDNs. A Splunk or Elastic search that identifies hosts with an unusually narrow set of egress destinations over time can help bubble these up.
 
 **Putting It All Together**\
+
 At the end of the day, you're not trying to flag all C2 redirectors. You're trying to bubble up *the weird*. That's where statistical models, even simple ones like z-scores or percentiles, can start to work in your favor. No solution is perfect, and every environment has its own background noise---but periodicity, rarity, and low-diversity are telltale traits of redirectors that stand out just enough to be hunted, if you're looking in the right places. The trick is to move away from chasing domains and move toward identifying patterns.
 
 Here's a **Blue Team Cheatsheet** section that consolidates the redirector services I've covered (Azure FrontDoor, Cloudflare Workers, AWS Lambda, Google Cloud, the rest) and frames out how an analyst can start building detection queries in Splunk, Elastic, or Chronicle. It focuses on the *how* and *why*, not just throwing regex at a wall.
@@ -150,6 +155,7 @@ Here's a **Blue Team Cheatsheet** section that consolidates the redirector servi
 
 
 **C2 Redirector Cheatsheet: Pivot Points and Search Starters**\
+
 So what do you actually search for when you suspect redirector use, or when you just want to go hunting? A lot of redirector infrastructure won't show up in traditional threat intel feeds. But the nature of how C2 works means it usually gives itself away in volume, repetition, or timing --- even if the destination is cloud-hosted and the traffic is encrypted. You're not always looking for a smoking gun. Sometimes you're just looking for a slightly warm barrel.
 
 Here are the redirector services we've discussed so far, along with the pivot points you can use in DNS, proxy, or HTTP logs to begin triaging:
@@ -175,6 +181,7 @@ Here are the redirector services we've discussed so far, along with the pivot po
 -   HTTP logs (Chronicle, Zeek, etc.): Look for repeated POST or GET traffic to these hosts, especially with unusual URI paths or consistent beaconing intervals.
 
 **Sample Splunk Query:**
+
 ```
 index=proxy OR index=dns
 
@@ -188,6 +195,7 @@ index=proxy OR index=dns
 This gives you a frequency snapshot --- how many times a given IP hit one of these services, with what paths and user-agents. Adjust the threshold (count > 5) depending on your baseline.
 
 **Elastic (Lucene) Query Equivalent:**
+
 ```
 domain:(*.azurefd.net OR *.cloudflareworkers.com OR *.lambda-url.*.on.aws OR *.cloudfunctions.net OR webhook.site OR *.frge.io OR *.epizy.com OR *.rf.gd OR *.dynu.com OR api.mocky.io OR *.pipedream.net OR *.mockbin.org)
 
@@ -195,6 +203,7 @@ From there, you can build visualizations of request frequency, URI patterns, or 
 ```
 
 **Google Chronicle YARA-L (for Domain Match):**
+
 ```
 rule Redirector_Domains {
 
