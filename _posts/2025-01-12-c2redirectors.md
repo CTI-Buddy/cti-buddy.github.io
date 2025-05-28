@@ -214,7 +214,7 @@ Here are the redirector services we've discussed so far, along with the pivot po
 
 -   *.azurefd.net → Azure FrontDoor
 -   *.cloudflareworkers.com / workers.dev → Cloudflare Workers
--   *.lambda-url.*.on.aws → AWS Lambda URLs
+-   *.lambda-url.*.on.aws or execute-api..amazonaws.com → AWS Lambda URLs
 -   *.cloudfunctions.net or *.appspot.com → Google Cloud Functions
 -   webhook.site → Webhook capture service
 -   *.frge.io → FrgeIO redirector endpoints
@@ -223,6 +223,7 @@ Here are the redirector services we've discussed so far, along with the pivot po
 -   api.mocky.io → Mocky HTTP response mocking
 -   *.pipedream.net → Pipedream integration endpoints
 -   *.mockbin.org → Mockbin response generator
+
 <br />
 
 **Log Sources to Pivot From:**
@@ -230,7 +231,7 @@ Here are the redirector services we've discussed so far, along with the pivot po
 -   DNS logs: Filter by query or domain fields for the above indicators. Use wildcard matches if supported.
 -   Proxy logs: Look at url, referrer, and user-agent fields. Atypical user-agents making repeated requests to these domains can signal abuse.
 -   HTTP logs (Chronicle, Zeek, etc.): Look for repeated POST or GET traffic to these hosts, especially with unusual URI paths or consistent beaconing intervals.
-
+<br />
 **Sample Splunk Query:**
 
 <pre><code>
@@ -262,7 +263,7 @@ rule Redirector_Domains {
 
 }
 </code></pre>
-
+<br />
 **Detection Tips:**
 
 -   Look for **beaconing behavior**: periodic DNS or HTTP requests at regular intervals.
