@@ -37,7 +37,19 @@
             position: relative;
             overflow-x: hidden;
         }
-        
+
+        a {
+  color: #66b2ff; /* Lighter blue */
+  text-decoration: none; /* Optional: removes underline */
+  transition: color 0.2s ease-in-out;
+}
+
+a:hover,
+a:focus {
+  color: #3399ff; /* Slightly darker on hover */
+  text-decoration: underline; /* Optional: underline on hover only */
+}
+
         /* Cyber scanline effect */
         body::after {
             content: "";
