@@ -4,7 +4,7 @@ title: "C2 Redirector Usage and You"
 date: 2025-01-12
 tagline: "A Blue Teamer's Guide to Obfuscated Command & Control"
 image: /IMG/011225.jpg
-tags: [Cobalt Strike, Infrastructure Tracking, Threat Intelligence]
+tags: [Command & Control, Threat Hunting, Infrastructure Tracking, Threat Intelligence]
 ---
 
 I'm a fan of chasing down command & control (C2) traffic for whatever reason, probably comes from my PCAP-exclusive analyst roots (ah, the pre-SSL everywhere days).  That understandably has gotten increasingly harder to do, and not only because of the embrace of SSL (which, to be clear, is a *good thing*), but because of all the various obfuscation quirks that make red teaming easier and blue teaming harder.  One of those quirks I tend to find more interesting is the usage of C2 redirectors, where C2 traffic is essentially "laundered" through a legitimate-looking server or cloud as a means of hiding origin, providing an air of legitimacy to what is likely high-frequency traffic, etc.  I say this, yet even in the year 2024 this technique has came and went in favor of keeping things simple with OAuth in the cloud rather than bothering with on-prem at all.  While that's certainly here to stay, I suspect C2 redirector usage will similarly be a long-term base-level of OPSEC for offense forever.
