@@ -77,6 +77,7 @@ Get-Service TermService | Select-Object Status, StartType
 
 - Queries the **"Remote Desktop Services"** Windows service (named TermService).
 - Displays its **Status** (e.g., Running, Stopped) and **StartType** (e.g., Automatic, Manual, Disabled).
+
 <br />
 **Why it's useful:**  
 
@@ -90,6 +91,7 @@ qwinsta /server:localhost
 
 - qwinsta (Query WINdows STAtion) lists all active **Remote Desktop sessions** on the local machine.
 - Shows session ID, user name, session state (Active/Disconnected), and type (console/rdp-tcp).
+
 <br />
 **Why it's useful:**
 This gives you **live visibility** into current or recently disconnected RDP sessions, which can help detect unauthorized or suspicious remote access.
@@ -110,19 +112,19 @@ This helps detect if someone on the machine is **actively running an RDP client*
 ```powershell
 netstat -an | findstr :3389
 ```
-
+<p></p>
 **What it does:**
 
 - Uses netstat to list **active network connections and listeners**.
 - findstr :3389 filters the results to only show connections involving **port 3389**, the default RDP port.
-
+<p></p>
 **Why it's useful:**
 
 This quickly tells you if the system is:
 
 - **Listening** for inbound RDP connections (0.0.0.0:3389 or ::1:3389 in LISTENING state).
 - **Actively connected** to or from another IP on port 3389.
-
+<p></p>
 Another key indicator is **Windows Event IDs 4624/4625 with LogonType 10**. 4624 is a successful logon event in Windows Security Logs, and 4625 is a failed one. Both include the field “Logon Type” which describes how the user logged in. A LogonType 10 specifically refers to **RemoteInteractive** logons (like RDP).
 
 **Why it's useful:**
@@ -135,35 +137,36 @@ Another key indicator is **Windows Event IDs 4624/4625 with LogonType 10**. 4624
   - **Username** (TargetUserName)
   - **Workstation name**
   - **Logon Process Name** (should typically be User32 or Advapi for RDP)
-
+<p></p>
 Finally, here’s a bunch of queries for your preferred tool. This is specific to _inbound_ RDP usage, or at least a LISTEN on 3389. These will need to be further customized if you’re looking for more generic RDP, lateral, or outbound stuff.
 
 | **Tool** | **Detection Logic / Rule / Location** |
 | --- | --- |
-| **Cortex XDR** | dataset = xdr_data<br><br>\| filter event_type = "network"<br><br>\| filter action_network_remote_port = 3389<br><br>\| filter action_network_inbound = true<br><br>\| filter not(ip_network_contains("10.0.0.0/8", action_remote_ip)<br><br>or ip_network_contains("172.16.0.0/12", action_remote_ip)<br><br>or ip_network_contains("192.168.0.0/16", action_remote_ip)) |
-| **CrowdStrike Falcon** | #event_simpleName=/^(NetworkReceiveAcceptIP4\|NetworkListenIP4)$/ event_platform=Win LocalPort=3389<br><br>Also searchable in Falcon console under **"User Activity"** telemetry. |
-| **Elastic Agent (KQL)** | event.category:network and event.type:connection and destination.port:3389 and network.direction:inbound<br><br>and not (<br><br>source.ip:10.0.0.0/8 or<br><br>source.ip:172.16.0.0/12 or<br><br>source.ip:192.168.0.0/16<br><br>) |
-| **osquery** | SELECT<br><br>pid,<br><br>protocol,<br><br>local_address,<br><br>local_port,<br><br>remote_address,<br><br>remote_port,<br><br>state<br><br>FROM process_open_sockets<br><br>WHERE remote_port = 3389 OR local_port = 3389; |
+| **Cortex XDR** | dataset = xdr_data<br>\| filter event_type = "network"<br>\| filter action_network_remote_port = 3389<br>\| filter action_network_inbound = true<br>\| filter not(ip_network_contains("10.0.0.0/8", action_remote_ip)<br>or ip_network_contains("172.16.0.0/12", action_remote_ip)<br>or ip_network_contains("192.168.0.0/16", action_remote_ip)) |
+| **CrowdStrike Falcon** | #event_simpleName=/^(NetworkReceiveAcceptIP4\|NetworkListenIP4)$/ event_platform=Win LocalPort=3389<br>Also searchable in Falcon console under **"User Activity"** telemetry. |
+| **Elastic Agent (KQL)** | event.category:network and event.type:connection and destination.port:3389 and network.direction:inbound<br>and not (<br>source.ip:10.0.0.0/8 or<br>source.ip:172.16.0.0/12 or<br>source.ip:192.168.0.0/16<br>) |
+| **osquery** | SELECT<br>pid,<br>protocol,<br>local_address,<br>local_port,<br>remote_address,<br>remote_port,<br>state<br>FROM process_open_sockets<br>WHERE remote_port = 3389 OR local_port = 3389; |
 | **SentinelOne XDR** | ( event.type == "Login" AND event.login.type in:matchcase( "REMOTE_INTERACTIVE", "NETWORK", "CACHED_REMOTE_INTERACTIVE", "NETWORK_CLEAR_TEXT", "NETWORK_CREDENTIALS" ) AND event.login.loginIsSuccessful == true ) |
 | **Tenable Nessus** | Detects exposed RDP (TCP 3389) as a potential vulnerability or misconfiguration. Look for plugin IDs like **10940** (Remote Desktop Protocol Service Detection) or **5935** (Windows RDP / Terminal Services Detection). |
 
+<p></p>
 ## Virtual Network Computing (VNC)
-
+<p></p>
 VNC is a cross-platform remote desktop protocol that transmits keyboard, mouse, and screen data over a network. Unlike RDP, VNC works across different operating systems and typically uses ports 5900-5905, making it popular for mixed-environment laptop farms. Same premise here with the Powershell to start, except we’ll mix in some basic cmd as well:
-
+<p></p>
 ### Detection Techniques:
-
+<p></p>
 ```cmd
 tasklist | findstr /i "vnc x11vnc tightvnc realvnc tigervnc uvnc ultra"
 wmic process where "name like '%vnc%'" get name,processid,executablepath
 ```
-
+<p></p>
 **What it does:**
 
 - **`tasklist | findstr`**: Lists all running processes (\`tasklist\`) and filters (\`findstr\`) for common VNC-related process names (case-insensitive \`/i\`).
 
 - **`wmic process`**: Uses Windows Management Instrumentation (WMI) to find processes with "vnc" in their name and displays their name, PID, and full executable path.
-
+<p></p>
 **Why it's useful:**
 
 - Detects **active VNC servers** (e.g., TightVNC, UltraVNC, RealVNC).
