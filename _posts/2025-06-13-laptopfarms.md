@@ -54,16 +54,16 @@ In the sections that follow, we’ll dive into technical strategies for spotting
 ![image](https://github.com/user-attachments/assets/7cd5eef4-54f9-48e2-8ee7-0321fd802cf3)
 
 So the overall intent of this post is to iterate through a few technical indicators worth drilling down into and how an analyst might detect them. I tried to generally split this into two “tracks” – first, a few local commands one could run using organic/built-in tools and commands (think Powershell, netstat, etc), then I run through a few different commercial tools that a SOC might have deployed.. keeping to the bigger ones, and within reason. The local stuff can also be used in conjunction with tools like Tanium Deploy or Crowdstrike Falcon’s Real-Time-Response (RTR) so – just attempting to slice this as many ways as I can. I wouldn’t call this the authoritative writeup of all things laptop farm but it’s as authoritative as I could muster given my own time/patience/knowledge.
-<p></p>
+<br />
 
-# RDP/VNC and Software Detection
+## RDP/VNC and Software Detection
 
 <p></p>
 
 I’ll start with some of the easier stuff that most fleet systems shouldn’t have enabled in the first place, or at least be tightly controlled. Applications like AnyDesk or enabled RDP are generally basic steps most SOCs should have detection logic in place already, but for posterity let’s run through a few. At first, I leaned towards not mentioning this stuff as it felt a bit basic and would end up cluttering the post – however, when I outlined this post out it felt incomplete without including this. If you’re familiar with detecting these or have them outright disallowed in your network, feel free to just skip through this portion.
 <p></p>
 
-## Remote Desktop Protocol (RDP)
+### Remote Desktop Protocol (RDP)
 
 <p></p>
 
@@ -124,16 +124,16 @@ netstat -an | findstr :3389
 
 - Uses netstat to list **active network connections and listeners**.
 - findstr :3389 filters the results to only show connections involving **port 3389**, the default RDP port.
-<p></p>
+<br />
 **Why it's useful:**
 
 This quickly tells you if the system is:
 
 - **Listening** for inbound RDP connections (0.0.0.0:3389 or ::1:3389 in LISTENING state).
 - **Actively connected** to or from another IP on port 3389.
-<p></p>
+<br />
 Another key indicator is **Windows Event IDs 4624/4625 with LogonType 10**. 4624 is a successful logon event in Windows Security Logs, and 4625 is a failed one. Both include the field “Logon Type” which describes how the user logged in. A LogonType 10 specifically refers to **RemoteInteractive** logons (like RDP).
-
+<br />
 **Why it's useful:**
 
 - **Logon Type 10** is the canonical indicator of **RDP usage**, both successful and failed attempts.
@@ -144,9 +144,10 @@ Another key indicator is **Windows Event IDs 4624/4625 with LogonType 10**. 4624
     - **Username** (TargetUserName)
     - **Workstation name**
     - **Logon Process Name** (should typically be User32 or Advapi for RDP)
-<p></p>
+<br />
 Finally, here’s a bunch of queries for your preferred tool. This is specific to _inbound_ RDP usage, or at least a LISTEN on 3389. These will need to be further customized if you’re looking for more generic RDP, lateral, or outbound stuff.
 <br />
+
 | **Tool** | **Detection Logic / Rule / Location** |
 | --- | --- |
 | **Cortex XDR** | dataset = xdr_data<br>\| filter event_type = "network"<br>\| filter action_network_remote_port = 3389<br>\| filter action_network_inbound = true<br>\| filter not(ip_network_contains("10.0.0.0/8", action_remote_ip)<br>or ip_network_contains("172.16.0.0/12", action_remote_ip)<br>or ip_network_contains("192.168.0.0/16", action_remote_ip)) |
@@ -155,6 +156,7 @@ Finally, here’s a bunch of queries for your preferred tool. This is specific t
 | **osquery** | SELECT<br>pid,<br>protocol,<br>local_address,<br>local_port,<br>remote_address,<br>remote_port,<br>state<br>FROM process_open_sockets<br>WHERE remote_port = 3389 OR local_port = 3389; |
 | **SentinelOne XDR** | ( event.type == "Login" AND event.login.type in:matchcase( "REMOTE_INTERACTIVE", "NETWORK", "CACHED_REMOTE_INTERACTIVE", "NETWORK_CLEAR_TEXT", "NETWORK_CREDENTIALS" ) AND event.login.loginIsSuccessful == true ) |
 | **Tenable Nessus** | Detects exposed RDP (TCP 3389) as a potential vulnerability or misconfiguration. Look for plugin IDs like **10940** (Remote Desktop Protocol Service Detection) or **5935** (Windows RDP / Terminal Services Detection). |
+
 <br />
 ## Virtual Network Computing (VNC)
 <p></p>
