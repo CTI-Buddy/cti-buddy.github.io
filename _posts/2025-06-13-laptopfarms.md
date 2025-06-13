@@ -146,7 +146,7 @@ Another key indicator is **Windows Event IDs 4624/4625 with LogonType 10**. 4624
     - **Logon Process Name** (should typically be User32 or Advapi for RDP)
 <p></p>
 Finally, here’s a bunch of queries for your preferred tool. This is specific to _inbound_ RDP usage, or at least a LISTEN on 3389. These will need to be further customized if you’re looking for more generic RDP, lateral, or outbound stuff.
-<p></p>
+<br />
 | **Tool** | **Detection Logic / Rule / Location** |
 | --- | --- |
 | **Cortex XDR** | dataset = xdr_data<br>\| filter event_type = "network"<br>\| filter action_network_remote_port = 3389<br>\| filter action_network_inbound = true<br>\| filter not(ip_network_contains("10.0.0.0/8", action_remote_ip)<br>or ip_network_contains("172.16.0.0/12", action_remote_ip)<br>or ip_network_contains("192.168.0.0/16", action_remote_ip)) |
@@ -155,8 +155,7 @@ Finally, here’s a bunch of queries for your preferred tool. This is specific t
 | **osquery** | SELECT<br>pid,<br>protocol,<br>local_address,<br>local_port,<br>remote_address,<br>remote_port,<br>state<br>FROM process_open_sockets<br>WHERE remote_port = 3389 OR local_port = 3389; |
 | **SentinelOne XDR** | ( event.type == "Login" AND event.login.type in:matchcase( "REMOTE_INTERACTIVE", "NETWORK", "CACHED_REMOTE_INTERACTIVE", "NETWORK_CLEAR_TEXT", "NETWORK_CREDENTIALS" ) AND event.login.loginIsSuccessful == true ) |
 | **Tenable Nessus** | Detects exposed RDP (TCP 3389) as a potential vulnerability or misconfiguration. Look for plugin IDs like **10940** (Remote Desktop Protocol Service Detection) or **5935** (Windows RDP / Terminal Services Detection). |
-<p></p>
-<p></p>
+<br />
 ## Virtual Network Computing (VNC)
 <p></p>
 VNC is a cross-platform remote desktop protocol that transmits keyboard, mouse, and screen data over a network. Unlike RDP, VNC works across different operating systems and typically uses ports 5900-5905, making it popular for mixed-environment laptop farms. Same premise here with the Powershell to start, except we’ll mix in some basic cmd as well:
