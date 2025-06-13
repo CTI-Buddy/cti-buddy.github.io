@@ -54,10 +54,11 @@ In the sections that follow, we’ll dive into technical strategies for spotting
 ![image](https://github.com/user-attachments/assets/7cd5eef4-54f9-48e2-8ee7-0321fd802cf3)
 
 So the overall intent of this post is to iterate through a few technical indicators worth drilling down into and how an analyst might detect them. I tried to generally split this into two “tracks” – first, a few local commands one could run using organic/built-in tools and commands (think Powershell, netstat, etc), then I run through a few different commercial tools that a SOC might have deployed.. keeping to the bigger ones, and within reason. The local stuff can also be used in conjunction with tools like Tanium Deploy or Crowdstrike Falcon’s Real-Time-Response (RTR) so – just attempting to slice this as many ways as I can. I wouldn’t call this the authoritative writeup of all things laptop farm but it’s as authoritative as I could muster given my own time/patience/knowledge.
+<p></p>
 
-<br />
 # RDP/VNC and Software Detection
-<br />
+
+<p></p>
 
 I’ll start with some of the easier stuff that most fleet systems shouldn’t have enabled in the first place, or at least be tightly controlled. Applications like AnyDesk or enabled RDP are generally basic steps most SOCs should have detection logic in place already, but for posterity let’s run through a few. At first, I leaned towards not mentioning this stuff as it felt a bit basic and would end up cluttering the post – however, when I outlined this post out it felt incomplete without including this. If you’re familiar with detecting these or have them outright disallowed in your network, feel free to just skip through this portion.
 
