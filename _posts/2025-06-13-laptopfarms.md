@@ -8,12 +8,13 @@ tags: [Threat Intelligence, Threat Hunting, Threat Analysis]
 ---
 
 Since it is the flavor of the last few months and many are talking about it, I thought I would try to throw together all the detection techniques I could for catching DPRK worker schemes. I’ve also noticed that most are talking about techniques for catching them before they get hired – not many are talking about catching the ones that may already be working for them. So as a result.... have a long blog post! This is an attempt to gather every iteration of how this scheme works, at least as is currently known today.
-<br /><br />
+<p></p>
+<p></p>
 
 Background: North Korea’s Remote Worker Deception
 ==============================================
 
-<br />
+<p></p>
 In recent years, the U.S. government has publicly warned of a quiet but sophisticated campaign by North Korea to infiltrate the global tech workforce—not with malware, but with people. According to joint advisories from the FBI, Department of State, and the Department of the Treasury, the DPRK has deployed thousands of highly skilled IT professionals to work remotely for companies worldwide. Disguised as freelance developers or contractors, these operatives aim to generate revenue for the North Korean regime while gaining access to potentially sensitive technologies and internal corporate systems.
 
 The scheme is both clever and troubling. These remote workers often present forged documents, including fake U.S. passports or stolen identities, to create credible profiles on platforms like LinkedIn, Upwork, and GitHub. Their resumes typically show legitimate-sounding job histories and technical skills—Python development, mobile app engineering, blockchain smart contracts. Many even go as far as staging video calls with manipulated visuals or avatars to mask their real identities. Payment is often laundered through intermediaries, crypto wallets, or foreign bank accounts, making detection especially challenging.
@@ -22,9 +23,9 @@ What's particularly insidious is how these individuals embed themselves into the
 
 This campaign differs from traditional cyber intrusion tactics by blending social engineering, fraud, and covert infrastructure. It's not just one individual posing as a freelancer—it’s an entire backend operation involving laptop farms, VPN obfuscation, and remote-control systems like PiKVM to simulate legitimate activity across dozens of devices. The objective isn't simply espionage; it’s financial survival for a regime increasingly isolated from the global economy. And as detection methods evolve, so too does the DPRK’s playbook—making it imperative for defenders to understand not just the actors, but the infrastructure that supports them – and tactics and indicators for discovering them.
 
-<br />
+<p></p>
 # Inside the Infrastructure: Laptop Farms, PiKVMs, and Remote Access Tools
-<br />
+<p></p>
 
 Beneath the surface of North Korea’s remote work campaign lies a dense and methodically engineered technical ecosystem. Far from a lone developer dialing in from a Pyongyang apartment, intelligence reports and private sector investigations have uncovered the widespread use of **“laptop farms”**—rooms filled with dozens of laptops or small-form-factor PCs connected to the same local area network. Each device is configured with a unique identity: its own OS install, user profile, browser history, or VPN tunnel. Typically these are commercial fleet machines shipped to the “remote worker”. From the outside, they appear to be different individuals logging in from different cities, or are multiple employees working across different organizations, when in reality they’re part of a centralized fraud operation controlled from afar.
 
@@ -38,10 +39,11 @@ These infrastructures are often housed in nondescript locations: apartments, ren
 <p></p>
 
 ![image](https://github.com/user-attachments/assets/86a0a988-a6dc-4972-8fac-b392ade42f08)
+<p></p>
 
-<br />
 # Beyond the Interview: Why Pre-Onboarding Isn’t Enough
-<br />
+
+<p></p>
 
 Many organizations have begun to wise up to the risks posed by fraudulent remote workers, especially in sensitive sectors like software development, finance, and healthcare. Vetting strategies now often include deeper background checks, identity verification services, video interviews, and even geolocation validation to confirm where a candidate is physically located. Some firms go as far as requiring hardware key handoffs, in-person onboarding, or biometric authentication. These measures are good—and in some cases, essential—but they’re still not foolproof.
 
