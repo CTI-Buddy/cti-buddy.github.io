@@ -133,6 +133,7 @@ This quickly tells you if the system is:
 - **Actively connected** to or from another IP on port 3389.
 <br />
 Another key indicator is **Windows Event IDs 4624/4625 with LogonType 10**. 4624 is a successful logon event in Windows Security Logs, and 4625 is a failed one. Both include the field “Logon Type” which describes how the user logged in. A LogonType 10 specifically refers to **RemoteInteractive** logons (like RDP).
+
 <br />
 **Why it's useful:**
 
@@ -144,6 +145,7 @@ Another key indicator is **Windows Event IDs 4624/4625 with LogonType 10**. 4624
     - **Username** (TargetUserName)
     - **Workstation name**
     - **Logon Process Name** (should typically be User32 or Advapi for RDP)
+
 <br />
 Finally, here’s a bunch of queries for your preferred tool. This is specific to _inbound_ RDP usage, or at least a LISTEN on 3389. These will need to be further customized if you’re looking for more generic RDP, lateral, or outbound stuff.
 <br />
@@ -199,6 +201,7 @@ Get-NetTCPConnection -State Listen | Where-Object { $\_.LocalPort -ge 5900 -and 
 - \`findstr\` filters for **default VNC ports (5900-5905)**.
 
 - **PowerShell version**: Uses \`Get-NetTCPConnection\` to check for listening ports in the VNC range (5900-5905).
+
 <br />
 **Why it's useful:**
 
@@ -229,6 +232,7 @@ Get-ChildItem -Path "C:\Program Files*" -Recurse -Force -Include "*vnc*" -ErrorA
 - Looks for **VNC installation directories** in \`Program Files\`.
 
 - **PowerShell version** does the same but with better error handling (\`-ErrorAction SilentlyContinue\`).
+
 <br />
 **Why it's useful:**
 
@@ -237,9 +241,11 @@ Get-ChildItem -Path "C:\Program Files*" -Recurse -Force -Include "*vnc*" -ErrorA
 - Helps identify **old/uninstalled VNC software** (leftover files may contain sensitive data).
 
 - Useful to see if VNC was ever installed.
+
 <br />
 ## AnyDesk, TeamViewer, pick your preferred EXE
 <br />
+
 AnyDesk is a commercial remote desktop application known for its ease of deployment and ability to traverse NAT/firewall restrictions. It's particularly favored in laptop farm operations because it requires minimal configuration and can establish connections through relay servers without complex network setup.
 
 TeamViewer is a widely-used commercial remote access solution that supports cross-platform connections and includes features like file transfer and VPN functionality. Its commercial legitimacy makes it attractive for laptop farm operators who want to appear professional, though it also creates extensive logs that can reveal suspicious usage patterns.
@@ -248,6 +254,7 @@ At this point, you might be thinking that there’s any number of applications w
 
 The below takes the prior RDP and VNC indicators and throws in a couple more well-known Remote Access tools into a consolidated Powershell script. If you suspect others in your environment, it’s pretty simple to add in string searches or other keywords within this script. After that is another table of the fancy tools that I will consolidate as much of the prior as possible as well. Warning – this will end up looking hilariously messy. For that reason (as you may have noticed in the prior RDP section) and in the interest of space, these will output as raw results rather than formatted tables. You’re probably better off outputting these results as formatted tables or limiting to certain fields. Don’t say I didn’t warn you.
 
+<br />
 ### Detection Techniques:
 <br />
 ``` Powershell
@@ -331,6 +338,7 @@ Get-NetFirewallRule -DisplayName "*Remote Desktop*" | Where-Object { $_.Enabled 
 | **osquery** | SELECT<br>'network' AS type,<br>p.pid,<br>p.name AS process,<br>pos.local_port,<br>pos.remote_address,<br>CASE<br>WHEN pos.local_port IN (5900,5901,5902) THEN 'VNC'<br>WHEN pos.local_port = 3389 THEN 'RDP'<br>WHEN pos.local_port = 5938 THEN 'TeamViewer'<br>WHEN pos.local_port = 7070 THEN 'AnyDesk'<br>ELSE 'Other'<br>END AS tool<br>FROM process_open_sockets pos<br>JOIN processes p USING(pid)<br>WHERE pos.local_port IN (3389,5900,5901,5902,5938,7070,8172)<br>UNION ALL<br>SELECT<br>'process' AS type,<br>pid,<br>name AS process,<br>NULL AS local_port,<br>NULL AS remote_address,<br>CASE<br>WHEN name LIKE '%vnc%' THEN 'VNC'<br>WHEN name LIKE '%anydesk%' THEN 'AnyDesk'<br>WHEN name LIKE '%teamviewer%' THEN 'TeamViewer'<br>ELSE 'Other'<br>END AS tool<br>FROM processes<br>WHERE name LIKE '%vnc%' OR name LIKE '%anydesk%' OR name LIKE '%teamviewer%'<br>UNION ALL<br>SELECT<br>'service' AS type,<br>NULL AS pid,<br>name AS process,<br>NULL AS local_port,<br>NULL AS remote_address,<br>'Persistent' AS tool<br>FROM services<br>WHERE name LIKE '%vnc%' OR name LIKE '%anydesk%'; |
 | **SentinelOne XDR** | (<br>// 1. All detection methods combined<br>(event.type == "Login" AND event.login.loginIsSuccessful AND<br>event.login.type in:matchcase("REMOTE_INTERACTIVE", "NETWORK\*", "CACHED\*"))<br>OR<br>(event.type == "Process" AND event.process.name matches:wildcard("\*vnc\*", "\*anydesk\*", "\*teamviewer\*"))<br>OR<br>(event.type == "Network" AND event.network.dstPort in:(3389, 5900, 5901, 5902, 5938, 7070, 8172) AND<br>NOT ip.inRange(event.network.remoteAddress, "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"))<br>OR<br>(event.type == "File" AND event.file.fullPath matches:wildcard("\*\\\\anydesk\\\\\*", "\*\\\\vnc\\\\\*", "\*ultravnc.ini"))<br>) |
 | **Tenable Nessus** | So many plugins. Use the search function on the [Plugin database](https://www.tenable.com/plugins/search), but here’s a few quick ones.<br>**10940** Remote Desktop Protocol Service Detection<br>**5935** Windows RDP / Terminal Services Detection<br>**189953** AnyDesk Installed (Windows)<br>**10342** VNC Software Detection<br>**6065** VNC Client Detection<br>**52715** TeamViewer Version Detection<br>**121245** TeamViewer remote detection |
+
 <br />
 
 ## A Quick Note on Apache Guacamole and other Clientless Remote Access Stuff
