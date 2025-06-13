@@ -4,14 +4,15 @@ title: "Catching North Koreans & Laptop Farms"
 date: 2025-06-02
 tagline: "Detection Techniques for Farms on Your Network"
 image: /IMG/060225.jpg
-tags: [Threat Intelligence, Threat Hunting, Threat Hunting]
+tags: [Threat Intelligence, Threat Hunting, Threat Analysis]
 ---
 
 Since it is the flavor of the last few months and many are talking about it, I thought I would try to throw together all the detection techniques I could for catching DPRK worker schemes. I’ve also noticed that most are talking about techniques for catching them before they get hired – not many are talking about catching the ones that may already be working for them. So as a result, have a long blog post.
 
+<br />
 Background: North Korea’s Remote Worker Deception
 ==============================================
-
+<br />
 
 In recent years, the U.S. government has publicly warned of a quiet but sophisticated campaign by North Korea to infiltrate the global tech workforce—not with malware, but with people. According to joint advisories from the FBI, Department of State, and the Department of the Treasury, the DPRK has deployed thousands of highly skilled IT professionals to work remotely for companies worldwide. Disguised as freelance developers or contractors, these operatives aim to generate revenue for the North Korean regime while gaining access to potentially sensitive technologies and internal corporate systems.
 
@@ -21,7 +22,9 @@ What's particularly insidious is how these individuals embed themselves into the
 
 This campaign differs from traditional cyber intrusion tactics by blending social engineering, fraud, and covert infrastructure. It's not just one individual posing as a freelancer—it’s an entire backend operation involving laptop farms, VPN obfuscation, and remote-control systems like PiKVM to simulate legitimate activity across dozens of devices. The objective isn't simply espionage; it’s financial survival for a regime increasingly isolated from the global economy. And as detection methods evolve, so too does the DPRK’s playbook—making it imperative for defenders to understand not just the actors, but the infrastructure that supports them – and tactics and indicators for discovering them.
 
+<br />
 # Inside the Infrastructure: Laptop Farms, PiKVMs, and Remote Access Tools
+<br />
 
 Beneath the surface of North Korea’s remote work campaign lies a dense and methodically engineered technical ecosystem. Far from a lone developer dialing in from a Pyongyang apartment, intelligence reports and private sector investigations have uncovered the widespread use of **“laptop farms”**—rooms filled with dozens of laptops or small-form-factor PCs connected to the same local area network. Each device is configured with a unique identity: its own OS install, user profile, browser history, or VPN tunnel. Typically these are commercial fleet machines shipped to the “remote worker”. From the outside, they appear to be different individuals logging in from different cities, or are multiple employees working across different organizations, when in reality they’re part of a centralized fraud operation controlled from afar.
 
@@ -35,7 +38,9 @@ These infrastructures are often housed in nondescript locations: apartments, ren
 
 ![image](https://github.com/user-attachments/assets/86a0a988-a6dc-4972-8fac-b392ade42f08)
 
+<br />
 # Beyond the Interview: Why Pre-Onboarding Isn’t Enough
+<br />
 
 Many organizations have begun to wise up to the risks posed by fraudulent remote workers, especially in sensitive sectors like software development, finance, and healthcare. Vetting strategies now often include deeper background checks, identity verification services, video interviews, and even geolocation validation to confirm where a candidate is physically located. Some firms go as far as requiring hardware key handoffs, in-person onboarding, or biometric authentication. These measures are good—and in some cases, essential—but they’re still not foolproof.
 
@@ -47,7 +52,9 @@ In the sections that follow, we’ll dive into technical strategies for spotting
 
 So the overall intent of this post is to iterate through a few technical indicators worth drilling down into and how an analyst might detect them. I tried to generally split this into two “tracks” – first, a few local commands one could run using organic/built-in tools and commands (think Powershell, netstat, etc), then I run through a few different commercial tools that a SOC might have deployed.. keeping to the bigger ones, and within reason. The local stuff can also be used in conjunction with tools like Tanium Deploy or Crowdstrike Falcon’s Real-Time-Response (RTR) so – just attempting to slice this as many ways as I can. I wouldn’t call this the authoritative writeup of all things laptop farm but it’s as authoritative as I could muster given my own time/patience/knowledge.
 
+<br />
 # RDP/VNC and Software Detection
+<br />
 
 I’ll start with some of the easier stuff that most fleet systems shouldn’t have enabled in the first place, or at least be tightly controlled. Applications like AnyDesk or enabled RDP are generally basic steps most SOCs should have detection logic in place already, but for posterity let’s run through a few. At first, I leaned towards not mentioning this stuff as it felt a bit basic and would end up cluttering the post – however, when I outlined this post out it felt incomplete without including this. If you’re familiar with detecting these or have them outright disallowed in your network, feel free to just skip through this portion.
 
@@ -190,16 +197,16 @@ Get-NetTCPConnection -State Listen | Where-Object { $\_.LocalPort -ge 5900 -and 
 ---
 
 ```cmd
-dir /s /b C:\\Users\\\*\\.vnc
-dir /s /b C:\\Users\\\*\\vnc.ini
-dir /s /b C:\\Users\\\*\\ultravnc.ini
-dir /s /b "C:\\Program Files\\\*vnc\*"
-dir /s /b "C:\\Program Files (x86)\\\*vnc\*"
-
+dir /s /b C:\Users\*\.vnc
+dir /s /b C:\Users\*\vnc.ini
+dir /s /b C:\Users\*\ultravnc.ini
+dir /s /b "C:\Program Files\*vnc*"
+dir /s /b "C:\Program Files (x86)\*vnc*"
 # And in PowerShell:
-Get-ChildItem -Path C:\\Users -Recurse -Force -Include "\*vnc\*" -ErrorAction SilentlyContinue
-Get-ChildItem -Path "C:\\Program Files\*" -Recurse -Force -Include "\*vnc\*" -ErrorAction SilentlyContinue
-```
+Get-ChildItem -Path C:\Users -Recurse -Force -Include "*vnc*" -ErrorAction SilentlyContinue
+Get-ChildItem -Path "C:\Program Files*" -Recurse -Force -Include "*vnc*" -ErrorAction SilentlyContinue
+```  
+
 
 **What it does:**
 
@@ -234,74 +241,72 @@ The below takes the prior RDP and VNC indicators and throws in a couple more wel
 # Checks for VNC, AnyDesk, TeamViewer, ScreenConnect, RDP, and others
 
 # 1. Detect Running Processes & Services
-Write-Host "\`n\[!\] Checking for running remote access processes..." -ForegroundColor Yellow
-
+Write-Host "`n[!] Checking for running remote access processes..." -ForegroundColor Yellow
 $remoteTools = @(
-"\*vnc\*", "\*anydesk\*", "\*teamviewer\*", "\*screenconnect\*", "\*connectwise\*",
-"\*splashtop\*", "\*logmein\*", "\*gotomypc\*", "\*radmin\*", "\*ultraviewer\*", "\*rustdesk\*"
+    "*vnc*", "*anydesk*", "*teamviewer*", "*screenconnect*", "*connectwise*",
+    "*splashtop*", "*logmein*", "*gotomypc*", "*radmin*", "*ultraviewer*", "*rustdesk*"
 )
-Get-Process | Where-Object { $\_.Name -like ($remoteTools -join " -or Name -like ") } | Select-Object Name, Id, Path
-Get-Service | Where-Object { $\_.DisplayName -like ($remoteTools -join " -or DisplayName -like ") } | Select-Object Name, DisplayName, Status
+Get-Process | Where-Object { $_.Name -like ($remoteTools -join " -or Name -like ") } | Select-Object Name, Id, Path
+Get-Service | Where-Object { $_.DisplayName -like ($remoteTools -join " -or DisplayName -like ") } | Select-Object Name, DisplayName, Status
 
 # 2. Check Listening Ports (VNC, RDP, etc.)
-Write-Host "\`n\[!\] Checking for common remote access ports..." -ForegroundColor Yellow
+Write-Host "`n[!] Checking for common remote access ports..." -ForegroundColor Yellow
 $remotePorts = @(5900, 5901, 5902, 3389, 5938, 6568, 7070, 8172)
-Get-NetTCPConnection -State Listen | Where-Object { $remotePorts -contains $\_.LocalPort } |
-Select-Object LocalAddress, LocalPort, OwningProcess |
-ForEach-Object {
-$proc = Get-Process -Id $\_.OwningProcess -ErrorAction SilentlyContinue
-\[PSCustomObject\]@{
-Port = $\_.LocalPort
-
-Process = $proc.Name
-PID = $\_.OwningProcess
-Path = $proc.Path
-}
-}
+Get-NetTCPConnection -State Listen | Where-Object { $remotePorts -contains $_.LocalPort } | 
+    Select-Object LocalAddress, LocalPort, OwningProcess | 
+    ForEach-Object {
+        $proc = Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue
+        [PSCustomObject]@{
+            Port = $_.LocalPort
+            Process = $proc.Name
+            PID = $_.OwningProcess
+            Path = $proc.Path
+        }
+    }
 
 # 3. Check Registry for Installed Software
-Write-Host "\`n\[!\] Checking registry for remote access tools..." -ForegroundColor Yellow
+Write-Host "`n[!] Checking registry for remote access tools..." -ForegroundColor Yellow
 $regPaths = @(
-"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\\*",
-"HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\\*"
+    "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*",
+    "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*"
 )
-Get-ItemProperty $regPaths | Where-Object {
-$\_.DisplayName -match "vnc|anydesk|teamviewer|screenconnect|connectwise|splashtop|logmein|radmin|ultraviewer|rustdesk"
+Get-ItemProperty $regPaths | Where-Object { 
+    $_.DisplayName -match "vnc|anydesk|teamviewer|screenconnect|connectwise|splashtop|logmein|radmin|ultraviewer|rustdesk" 
 } | Select-Object DisplayName, InstallLocation
 
 # 4. Check Common Installation Directories
-Write-Host "\`n\[!\] Scanning for installation files..." -ForegroundColor Yellow
+Write-Host "`n[!] Scanning for installation files..." -ForegroundColor Yellow
 $searchPaths = @(
-"$env:ProgramFiles",
-"$env:ProgramFiles (x86)",
-"$env:APPDATA",
-"$env:LOCALAPPDATA"
+    "$env:ProgramFiles", 
+    "$env:ProgramFiles (x86)", 
+    "$env:APPDATA", 
+    "$env:LOCALAPPDATA"
 )
-$searchTerms = @("\*vnc\*", "\*anydesk\*", "\*teamviewer\*", "\*screenconnect\*", "\*connectwise\*", "\*splashtop\*")
+$searchTerms = @("*vnc*", "*anydesk*", "*teamviewer*", "*screenconnect*", "*connectwise*", "*splashtop*")
 foreach ($path in $searchPaths) {
-Get-ChildItem -Path $path -Recurse -Force -Include $searchTerms -ErrorAction SilentlyContinue |
-Select-Object FullName, LastWriteTime
+    Get-ChildItem -Path $path -Recurse -Force -Include $searchTerms -ErrorAction SilentlyContinue | 
+        Select-Object FullName, LastWriteTime
 }
 
 # 5. Check for Log Files (TeamViewer, AnyDesk, etc.)
-Write-Host "\`n\[!\] Checking for remote access log files..." -ForegroundColor Yellow
+Write-Host "`n[!] Checking for remote access log files..." -ForegroundColor Yellow
 $logFiles = @(
-"$env:ProgramFiles\*\\TeamViewer\\TeamViewer\*\_Logfile.log",
-"$env:APPDATA\\AnyDesk\\\*.trace",
-"$env:ProgramData\\ScreenConnect\\Logs\\\*.log"
+    "$env:ProgramFiles*\TeamViewer\TeamViewer*_Logfile.log",
+    "$env:APPDATA\AnyDesk\*.trace",
+    "$env:ProgramData\ScreenConnect\Logs\*.log"
 )
 foreach ($log in $logFiles) {
-if (Test-Path $log) {
-Get-Content $log | Select-String -Pattern "Connection|established|session" -CaseSensitive:$false | Select-String -NotMatch -Pattern "disconnected" | Select-Object -First 5
-}
+    if (Test-Path $log) {
+        Get-Content $log | Select-String -Pattern "Connection|established|session" -CaseSensitive:$false | Select-String -NotMatch -Pattern "disconnected" | Select-Object -First 5
+    }
 }
 
 # 6. Check RDP Configuration (Optional)
-
-Write-Host "\`n\[!\] Checking RDP (Remote Desktop) Status..." -ForegroundColor Yellow
-Get-ItemProperty "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server" -Name "fDenyTSConnections" -ErrorAction SilentlyContinue
-Get-NetFirewallRule -DisplayName "\*Remote Desktop\*" | Where-Object { $\_.Enabled -eq "True" } | Select-Object DisplayName, Enabled
+Write-Host "`n[!] Checking RDP (Remote Desktop) Status..." -ForegroundColor Yellow
+Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -ErrorAction SilentlyContinue
+Get-NetFirewallRule -DisplayName "*Remote Desktop*" | Where-Object { $_.Enabled -eq "True" } | Select-Object DisplayName, Enabled
 ```
+
 
 
 | **Tool** | **Detection Logic / Rule / Location** |
