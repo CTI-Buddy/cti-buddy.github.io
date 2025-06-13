@@ -94,18 +94,19 @@ qwinsta /server:localhost
 
 <br />
 **Why it's useful:**
+<p></p>
 This gives you **live visibility** into current or recently disconnected RDP sessions, which can help detect unauthorized or suspicious remote access.
 
 ```powershell
 # Monitor RDP-related processes and connections_
 Get-Process | Where-Object {$\_.ProcessName -like "\*rdp\*" -or $\_.ProcessName -like "\*mstsc\*"}
 ```
-
+<p></p>
 **What it does:**
 
 - Lists running processes that include "rdp" or "mstsc" in the name.
 - mstsc.exe is the **Remote Desktop Client** (used to initiate outbound RDP sessions).
-
+<p></p>
 **Why it's useful:**  
 This helps detect if someone on the machine is **actively running an RDP client**, which could indicate outbound connections to other systems—especially useful in lateral movement detection.
 
