@@ -61,10 +61,11 @@ So the overall intent of this post is to iterate through a few technical indicat
 <p></p>
 
 I’ll start with some of the easier stuff that most fleet systems shouldn’t have enabled in the first place, or at least be tightly controlled. Applications like AnyDesk or enabled RDP are generally basic steps most SOCs should have detection logic in place already, but for posterity let’s run through a few. At first, I leaned towards not mentioning this stuff as it felt a bit basic and would end up cluttering the post – however, when I outlined this post out it felt incomplete without including this. If you’re familiar with detecting these or have them outright disallowed in your network, feel free to just skip through this portion.
+<p></p>
 
-<br />
 ## Remote Desktop Protocol (RDP)
-<br />
+
+<p></p>
 
 RDP is Microsoft's proprietary protocol for remote desktop access, built into Windows systems by default. It allows full desktop control over TCP port 3389 and is often the first choice for managing Windows machines remotely due to its native integration and performance. If you haven’t chased this down in a lab exercise or in a live SOC environment, there’s a few different ways you might catch this. Here’s some Powershell to start:
 
