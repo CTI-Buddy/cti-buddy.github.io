@@ -364,6 +364,7 @@ TinyPilot is a commercial KVM-over-IP solution similar to PiKVM but with a more 
 These are, frankly, pretty tough to detect if sufficiently customized, namely because a user can customize the configuration to throw dummy values. That said, I’d say the current authoritative source on how to do that has already been done by [Grumpy Goose Labs](https://blog.grumpygoose.io/hold-me-closer-tinypilot-f94455431921) in a couple of [blog posts.](https://blog.grumpygoose.io/unemployfuscation-1a1721485312) Frankly there’s nothing really to add to it and I’d just be cribbing their notes. That said, I can at least take those indicators and plug them into logic for the big list o’ tools. I’ll also add a few more queries you can try that aren’t necessarily specific to PiKVM or TinyPilot, but may assist in identifying similar devices – since they’re probably going to switch up (and have.. as you’ll see at the end of this).
 
 So first things first, let’s restate the good work from Grumpy Goose in the form of default config and indicators. Most of this relies on the default configuration of both devices. This is how they would present themselves to the OS of the system they are accessing via physical plug-in.
+
 <br />
 **TinyPilot:**
 
@@ -371,6 +372,7 @@ So first things first, let’s restate the good work from Grumpy Goose in the fo
 - **Product ID (PID):** 0104
 - **Serial Number:** 6b65796d696d6570690
 - **Manufacturer:** tinypilot
+
 <br />
 **PiKVM:**
 
@@ -378,10 +380,12 @@ So first things first, let’s restate the good work from Grumpy Goose in the fo
 - **Product ID (PID):** 0104
 - **Serial Number:** CAFEBABE
 - **Manufacturer:** PiKVM
+
 <br />
 **Why it's useful:**
 
 These identifiers are consistent in default configurations and can be used to detect hardware KVM devices connected to endpoints.
+
 <br />
 ### PowerShell Detection Commands
 <br />
@@ -407,6 +411,7 @@ These commands allow for the identification of connected devices based on known 
 
 So Grumpy Goose has the Crowdstrike query locked down great, here’s the big table of everybody else (and also a more generic offering on my behalf for Falcon)
 <br />
+
 | **Tool** | **Detection Logic / Rule / Location** |
 | --- | --- |
 | **Cortex XDR** | dataset = xdr_data<br>\| filter event_type = ENUM.DEVICE<br>and (device_instance_id contains "6b65796d696d6570690" or device_instance_id contains "CAFEBABE")<br>\| fields agent_hostname, event_sub_type, device_instance_id, device_vendor_id, device_product_id, actor_process_image_name, \_time<br>\| sort \_time desc |
@@ -422,6 +427,7 @@ Of course, this is dependent on the laptop farm utilizing default configs for th
 Changing the config and making either device is relatively simple, outlined here (<https://docs.pikvm.org/id/>) and here (<https://tinypilotkvm.com/faq/target-detect-tinypilot/#modifying-tinypilots-display-information>). You can try looking for that Corsair Gaming RGB in the PiKVM guide, as some will just follow the guide (I’ve actually seen this one), but a savvy user can look up any product information and fill out the config appropriately.
 
 That said, there are some more generic queries you can use that will grab all USB peripherals as well as video capture devices. This can be useful for comparing individual systems to see if they’ve got weirdness like two “keyboards” plugged in.
+
 <br />
 **Generic USB and HID Device Detection (Windows)**
 
@@ -441,6 +447,7 @@ Select-Object Description, DeviceID, Manufacturer
 **Why it's useful:**
 <br />
 These methods help baseline known-good devices and spot **unexpected USB peripherals** such as video capture devices or composite interfaces that often accompany KVM implants. While less precise than vendor-ID-based detections, they are useful for **detecting new, spoofed, or rebranded hardware**.
+
 <br />
 **Detection of Video Capture Devices (Windows)**
 
@@ -458,6 +465,7 @@ Select-Object DriverDesc, MatchingDeviceId
 KVM-over-IP devices often include HDMI or USB video capture components. This technique highlights systems that **expose video input hardware despite no legitimate use case**, particularly on user endpoints where capture functionality is unnecessary.
 
 Setting up a KVM device like this does take some doing, and as public awareness of this scheme grows operators will need to obfuscate what they’re doing when approaching potential farmers. Notionally, it’ll be tough to justify to an unwitting facilitator that receiving, plugging in and configuring strange devices is above-board.
+
 <br />
 # Endpoint Technical Indicators
 <br />
@@ -491,38 +499,47 @@ arp -a | Select-String '04-C9-8B|B8-27-EB|28-CD-C1|D8-3A-DD|DC-A6-32|E4-5F-01|2C
 ```
 <br />
 This helps with hardware detection, the assumption being that 1) your DPRK employee is working through a laptop farm and 2) said laptop farm uses PiKVMs or TinyPilots for it’s access. Depending on your EDR (if you have an EDR), you can dig a little deeper into this theory.
+
 <br />
 ## Crowdstrike Falcon’s “Unmanaged Assets”
 <br />
 My real-world experience is primarily with **CrowdStrike Falcon**, so that’s the example I’ll focus on. After reviewing documentation from other EDR platforms, it doesn’t appear that many competitors offer a feature quite like Falcon’s **Unmanaged Assets**, which collects various data points — including hostnames and MAC addresses — to identify nearby devices on the LAN. That said, it’s possible similar capabilities exist under different names or configurations in other tools. This isn’t an endorsement of CrowdStrike; I’m simply highlighting a feature I’ve personally used that proved useful in this specific context.
 
-Anyway – it’s not super clear in publicly available data how exactly this works (a la this [Reddit post](https://www.reddit.com/r/crowdstrike/comments/lf8hms/how_cs_identify_unmanaged_assets/)), but generally speaking you can expect Crowdstrike to look for other neighboring systems that are not checking in to its server to be flagged as “Unmanaged Assets” or “Unsupported Assts”.
+Anyway – it’s not super clear in publicly available data how exactly this works (a la this [Reddit post](https://www.reddit.com/r/crowdstrike/comments/lf8hms/how_cs_identify_unmanaged_assets/)), but generally speaking you can expect Crowdstrike to look for other neighboring systems that are not checking in to its server to be flagged as “Unmanaged Assets” or “Unsupported Assets”.
+
 <br />
 ![image](https://github.com/user-attachments/assets/48b23cc3-047d-4f4f-995c-d93202f4ff31)
 
 If you have the product, you can apparently read about it here: <https://falcon.crowdstrike.com/documentation/426/asset-discovery>
 
 This is the best publicly available screenshot I could get, but essentially various data points about neighboring systems that DO NOT have a Crowdstrike agent installed OR are not checking in to this particular instance are flagged as “Unmanaged”.
+
 <br />
 ![image](https://github.com/user-attachments/assets/53d2dd4b-78dc-4870-bd0f-ab3612c5711d)
 <br />
+
 So you can probably imagine how this can be useful. In addition to looking up any “Unmanaged Assets” with MAC addresses matching Raspberry Pi’s or TinyPilots, we can also check suspect systems to see if they are on LANs with large rosters of other systems that look like laptops.
 
 This can be done in either “direction”, meaning you could start with fingerprinted Raspberry Pi’s, see which Managed Asset can see them (and how many), and subsequently identify other laptops on the LAN. Alternatively, you could find Managed Assets with large numbers of Unmanaged Assets associated with them. In this case, look for “business-y” sounding hostnames. “HR-MB001” or “FIN-001”, “OFFICE-DT-204”, “US-BOSTON-ADMIN01” or “NYC-SALES01”. Hostnames like this suggest fleet management, rather than the “Matt’s Laptop” sort of thing you might see with a personally owned device. **KEEP IN MIND** that you might just be looking at a WeWork or a Starbucks – but this is still a valid strategy.
 
 To give a very easy (and on-the-nose) example, let’s say you suspect an employee of being a DPRK operator – on their local LAN, you find Raspberry Pis and 7 other laptops with very corporate sounding names. Falcon makes this easy, but this is still partially observable via simple ARP as well. In either case, I would absolutely be looking further into this.
+
 <br />
 ## BSSID + Wigle
 <br />
 Additionally, using the **BSSID** — the unique MAC address of a Wi-Fi access point — opens up a powerful avenue for geolocation, especially when combined with open-source tools like [Wigle.net](https://wigle.net). When a laptop connects to a wireless network, the BSSID can often be observed via system logs, network telemetry, or endpoint queries. Analysts can take that BSSID and plug it into Wigle’s database, which crowdsources the physical locations of Wi-Fi networks based on prior scans.
 
 This technique becomes especially valuable in the context of **remote work fraud**, where individuals may misrepresent their physical location — claiming to be based in a certain city or region to meet job requirements or evade scrutiny. While it's often difficult for a SOC or analyst to independently verify a user’s actual location, the BSSID provides a quiet but reliable fingerprint of the wireless network the device is connected to. By looking up that BSSID on Wigle.net, analysts can often identify the **approximate physical location** of the access point — sometimes down to a building or block. This doesn’t guarantee you’ve geolocated the person (they could be using a neighbor’s Wi-Fi or tethering), but in practice it offers a useful signal when evaluating claims of geographic presence. For example, if an employee states they are based in Atlanta but their laptop consistently connects through an access point mapped to Malaysia, that’s a flag worth chasing. So in that regard, it should be noted that this use-case is specific to shipping the laptop to another location and not specifically within a laptop farm, though geolocation within your respective country should also work (i.e. if they claim to be working out of City A but the BSSID maps to a location in City B).
+
 <br />
 ![image](https://github.com/user-attachments/assets/d7c9a1b7-8f65-4a5e-9f36-0224613cf5b8)
+
 <div style="text-align: center;">
   **“Just checking in from Atlanta”**
   </div>
+  
 <br />
+
 | **Tool** | **Query / Command** |
 | --- | --- |
 | PowerShell (Windows) | netsh wlan show interfaces \| Select-String "BSSID" |
@@ -533,10 +550,12 @@ This technique becomes especially valuable in the context of **remote work fraud
 | SentinelOne XDR (Scripted) | netsh wlan show interfaces (via scripted job) |
 | Cortex XDR | _Scripted collection only_ |
 | Tenable Nessus | _Don’t think this is collected_ |
+
 <br />
 # Network Technical Indicators
 <br />
 Alright, network level. There’s two basic approaches I’m aware of in this regard, one that may or may not involve a laptop farm (VPN usage could route through a domestic network but – it also may not, and one that pretty clearly points to remote access into a laptop farm.
+
 <br />
 ## Astrill VPN
 <br />
@@ -552,16 +571,20 @@ Here’s how you’d find them:
 <br />
 ![image](https://github.com/user-attachments/assets/fc3b2a02-3d3c-4685-983e-355867887a0d)
 <br />
+
 Notionally you’d be doing this after you already have a public IP to investigate, but for demonstrative purposes you can use a tool like [Shodan](https://www.shodan.io/) or [Censys](https://search.censys.io/) to grab html headers, titles or body content.
+
 <br />
 ![image](https://github.com/user-attachments/assets/3a803c5e-d51c-4f90-bb86-5053372f7f10)
 <br />
+
 ```
 - http.html:'<script src="guacamole'
 - http.title:"PiKVM"
 - http.title:"TinyPilot"
 ```
 <br />
+
 HTTP Title can be changed, but these work in a pinch (plus if you’re drilling into an individual IP, things besides the title should be apparent). I like to grab body html where possible, which is why I’m using a snippet of JavaScript included on most Apache Guacamole logins.
 <br />
 # Very North Korea – Janky/Clever Tricks
@@ -573,15 +596,19 @@ I’m similarly skeptical of boutique (and relatively expensive, at scale.. ~$40
 While both of these approaches absolutely do exist and are used, I don’t see it as cost-effective when there are other strategies you can employ that are arguably harder to detect, less expensive to deploy, and are minimal labor load and technical skill requirement on the part of the hosting laptop farmer. It’s much simpler, cheaper and stealthier to just set up a Zoom meeting once a day and grant control to the remote operator. I think this is probably the most common technique.
 
 That said I should note my own bias creeping in – I’ve personally seen a lot more of the Zoom sharing than any fancy hardware (and I’ve frankly never worked anywhere where someone could just install AnyDesk, so I can’t speak to that).
+
 <br />
 ## Zoom Meetings and Web Socket C2
 <br />
+
 So what am I talking about here? Essentially at the very basic user level, I’m referring to the practice of using Zoom or a similar meeting platform to share the screen of a target machine and hand over remote control to the operator. This is painfully simplistic, virtually indistinguishable from other legitimate remote work, and extremely low-cost. The challenge here is setting up a mechanism to ensure persistent remote-control day after day. This can certainly be facilitated by the laptop farmer manually, but as I mentioned, it is likely getting increasingly more difficult to find laptop farmers, and it is likely that any level of anonymization and obfuscation (e.g. “I had no idea, I just plug the laptops in and let them run”) is preferred by the farmers. So what to do?
 
 Currently the best sourcing on this is [Sygnia](https://www.sygnia.co/blog/unmasking-north-korean-it-farm/), but there’s snippets of this and the supporting code floating around. In short – there’s a few different ways operators are being found to be persisting via the “Zoom Meeting Method”. **First**, basic Powershell and Power Automate to automate a join and relinquishing of screen control once a day, **second**, lightweight Python scripts on the target system itself receives commands via ARP from a standalone controller device (I know – trust me on this) to launch a Zoom meeting, or perhaps most elegantly – Raspberry Zero HIDs devices receiving automation commands. I’ll go in order.
+
 <br />
 ### All Windows – Power Automate / PowerShell
 <br />
+
 This is generally the most simple way to do this but coincidentally also one of the most detectable. It’s primarily accomplished via automation in Power Automate or PowerShell and is a relatively simple way to ensure persistence for daily work. Essentially, a pre-scheduled Zoom meeting is accessed via direct url (zoommtg://), launched via .ps1 scheduled task or direct from Power Automate, and utilizes a .NET class to automate a key press. A critical piece of the chain involves using SendKeys to automate pressing the ENTER key, generally timed to coincide with a pop-up request for control from the operator that has joined the meeting from the other side.
 
 The Powershell might look something like this:
@@ -649,30 +676,37 @@ def rebroadcast_command(command):
 psrc="0.0.0.0")
     sendp(packet, iface="eth0")
 ```
+
 <br />
 That would mean the C2 would look something like this:
 
 ![image](https://github.com/user-attachments/assets/da6e5443-f2b6-4678-89cf-f37d124c4240)
 
 In which a controller on the LAN would receive the WebSocket C2 and rebroadcast over ARP to all listeners. This would obviously require each system on LAN to have a listener also configured and subsequently execute commands. Again, keep in mind – this is happening off the enterprise network that the Operator is eventually working on, and thus – at least network-traffic wise, essentially undetectable.
+
 <br />
 ### Conceptualizing How it Works
 <br />
+
 I spent a lot of time trying to figure out how this would work, since the writeup explicitly mentions forensics on an organization’s laptop. The writeup mentions tools specific to Linux (xdg-open and xdotool), and I was skeptical that a company was shipping out Linux distros to its remote workers.
 
 Trying to fit this into Windows, a laptop would need to run [scapy](https://scapy.net/) to receive and interpret the ARP commands, which does require installation of [npcap](https://npcap.com/windows-10.html) in order to work. Then, it would be trivial to call a python script as in the use-case, but would have to swap out xdg-open and xdotool with something like Powershell in order to work. It might look something like this:
 
 ![image](https://github.com/user-attachments/assets/9bb551f4-90cb-4f5b-b429-f49c86095103)
 <br />
+
 This didn’t look feasible to me. If a user could install npcap, it would stand to reason that they might just opt for something like AnyDesk for simplicity. This may exist in the wild as a hybridized approach, but it seems a little too wonky to make sense. The ARP listener also suggests that this laptop would also be beaconing back over WebSocket to the C2 to confirm receipt of the command. This is detectable:
 
 ![image](https://github.com/user-attachments/assets/47a50ee6-03b5-4eda-a6d8-3da53e6e0c72)
 <br />
+
 It's also not super sophisticated. Again, this didn’t make sense. If you’re going to risk C2 detection on network, then why bother with the obfuscation that comes with Zoom screen sharing?
 <br />
+
 ### Bringing it All Together: Back to the Raspberry Pis
 <br />
-Spoiler – here is what I was overlooking. The /dev/hidg0 portion of the code snippets is critical. In addition to the network-based control, Sygnia observed the use of USB-based HID injection. A script decoded base64-encoded input events and wrote them directly to /dev/hidg0, a Linux device interface for simulating keyboard input. This method allowed the attacker to mimic human interaction—such as accepting Zoom remote control requests—on a connected machine. All observed scripts and techniques were reportedly discovered on a laptop submitted for forensic investigation after a law enforcement raid
+
+Spoiler – here is what I was overlooking. The /dev/hidg0 portion of the code snippets is critical. In addition to the network-based control, Sygnia observed the use of USB-based HID injection. A script decoded base64-encoded input events and wrote them directly to /dev/hidg0, a Linux device interface for simulating keyboard input. This method allowed the attacker to mimic human interaction—such as accepting Zoom remote control requests—on a connected machine. All observed scripts and techniques were reportedly discovered on a laptop submitted for forensic investigation after a law enforcement raid.
 
 ```python
 import base64  
@@ -683,6 +717,7 @@ def replay_input(encoded_event):
        f.write(decoded)
 ```
  <br />
+ 
 In the original writeup, this was presented as “found on the laptop”, and that may be so, but this is highly suggestive of additional devices on the network explicitly used to control said laptops. More specifically, this python receives the base64 encoded ARP command (literally only ‘open_zoom’ or ‘approve_remote’) and writes it directly to /dev/hidg0. This kernel device interface is _only_ available when USB Gadget mode is enabled. The subprocess.run() commands afterward suggest the corresponding execution for each of these commands:
 
 ```python
@@ -690,6 +725,7 @@ subprocess.run(["xdg-open", "zoommtg://zoom.us/start"], check=True)
 subprocess.run(["xdotool", "key", "Return"], check=True)
 ```
 <br />
+
 Again, Linux commands. So assuming accuracy in the writeup, this had to be in a dev environment or something. Maybe I’m way out of touch, but I still can’t see corporate Linux desktops being shipped out to remote workers. That said, it does jive with the earlier look at how the C2 functions. Commands short enough to be encoded within the hwsrc field of an ARP packet would allow the operator to first broadcast ‘open_zoom’, wait, and then broadcast ‘approve_remote’ after the operator manually requests control within the Zoom meeting. Honestly, it’s clever, scalable and impossible to detect on an enterprise – as it is happening entirely on the laptop farm’s LAN. Since we’re talking about low-cost HID devices as well, this could be accomplished with cheap $10-$15 [Raspberry Pi Zeros.](https://www.raspberrypi.com/products/raspberry-pi-zero/) Assuming multiple Operators colluding within the same LAN, this also allows everybody to start work at the same time using the same ARP rebroadcast.
 
 Subsequently, this does offer us an opportunity to speculate as to how this might work at scale _and_ on what is likely to be a significantly larger percentage of fleet Windows machines across multiple organizations.
@@ -698,18 +734,23 @@ Conceivably, it would look something like this on Windows, in which the two shor
 
 ![image](https://github.com/user-attachments/assets/b5763549-175d-4b81-a4e7-351fbecce98d)
 <br />
+
 It is maddeningly simple and virtually indistinguishable from normal traffic. That said, this would also suggest a relatively sophisticated setup effort on the part of DPRK operators, which would need to ship multiple RasPi Zeros and MicroSDs to a laptop farm, and subsequently instruct the farmer to download (likely) preconfigured OSes to each MicroSD. These would need to be trivially preconfigured with the Python code that includes the /dev/hidg0 inputs and at least one with the WebSocket C2. From there, it’s just plug and play.
 
 This also aligns with the C2 design and actually suggests a certain level of redundancy. If every Pi Zero is a listener/controller but _is also talking to the WebSocket C2_, then you have multiple failovers rebroadcasting the ARP traffic to all the other controllers as well. Therefore, the C2 on LAN might look something like this:
 <br />
 ![image](https://github.com/user-attachments/assets/cb82c532-b5ea-4d6e-b349-9a293e65d993)
+
 <br />
 ### So What’s the Point?
 <br />
+
 This is obviously speculative/theoretical, but we’ve read a ton about “thousands of DPRK remote workers” and I wanted to understand how that could work at scale. This setup conceivably _works at scale_, essentially “factory farming” local facilitators in a way that leaves all indicators functionally off detectable telemetry. To defenders, this looks like a daily standup meeting for each individual user, frankly, but provides direct control to DPRK remote operators in a way that scales across an entire laptop farm in a repeatable and redundant fashion.
+
 <br />
 ### And Is It Detectable?
 <br />
+
 Honestly.. yes? Kind of? If the Sygnia code is consistent across this operation, the usage of the direct-to-url _zoommtg://_, especially if run from the Run dialog, is something to key in on. Further, there are some methods to follow-up on that Zoom launch to see if the meeting remains persistent for a full day. I won’t go through all the tools for all this, but to use some simple SQL and Crowdstrike as an example:
 
 **What to Look For in EDR (e.g., CrowdStrike Falcon):**
@@ -719,23 +760,24 @@ Honestly.. yes? Kind of? If the Sygnia code is consistent across this operation,
 - If the HID device simulates Win+R followed by zoommtg://...:
     - **CrowdStrike would likely log this as a cmd.exe-less user shell invocation** or explorer.exe launching a URI.
     - Look for child processes of explorer.exe or RuntimeBroker.exe without a parent cmd.exe.
-
+<br />
 **2\. Foreground Window Change / Shell Execution**
 
 - EDRs often capture shell execution events, even if no binary is dropped.
 - The HID input will make Zoom the foreground app — this may be correlated with a zoom.exe process spawning immediately after an untyped shell interaction.
-
+<br />
 **3\. Unusual Input Sequences**
 
 - If the HID device is used **without the user's interaction**, the pattern of keystrokes (e.g., Win+R, short delay, URI, Enter) could look anomalous:
     - Especially if it happens consistently at the same time.
     - Or if it happens when the user is marked as inactive.
-
+<br />
 **4\. Zoom Process Activity**
 
 - CrowdStrike will definitely track zoom.exe execution:
     - If it runs with unusual parent-child relationships (e.g., no clear originating app or script).
     - Or if it happens without any keyboard or mouse input from a real user.
+
 <br />
 **Detection Strategy Example (Pseudo Falcon Query Syntax)**
 <br />
@@ -754,6 +796,7 @@ This would help isolate Zoom executions that:
 <br />
 You can extend this strategy further by comparing the launches over time as well. Conceivably, your DPRK operator is going to be running this daily – first thing every morning, so mapping the Run dialog launch against the timestamps may reveal daily launches using the same automation, like so:
 
+<br />
 ```sql
 event_platform="Win" 
 | event_type="ProcessRollup2" 
@@ -770,24 +813,32 @@ event_platform="Win"
 | groupby DeviceName, DeviceUserName
 ```
 <br />
+
 So that will give you non-standard Run dialog Zoom launches over time, which is odd enough considering the average user is going to open the UI and launch their meetings, or click a link (which tends to be https:// in meeting invites). The only other odd behavioral indicator with these meetings is their length – operators are going to be screen-share remote-controlling all day long. So once you have your list of possibles, there’s Powershell you can run on them periodically throughout the day:
 
 ```powershell
 Get-Process | Where-Object { $\_.MainWindowHandle -ne 0 } | Select-Object Name, Id, MainWindowTitle
 ```
 <br />
+
 This will give you all active apps with visible windows. Thus, a Zoom meeting lasting all day long will always be active. You can script this to loop a bunch of times for more data points – but this is still arguably imperfect.
+
 <br />
 ### Back to that Hardware Detection
 <br />
+
 That hardware detection way back up there ^^ with ARP tables is useful here. If the setup is using these Pi Zeros, the detection strategies for EDR or the simple Powershell (repeated here) will be handy:
 
 ```powershell
 arp -a | Select-String '04-C9-8B|B8-27-EB|28-CD-C1|D8-3A-DD|DC-A6-32|E4-5F-01|2C-CF-67|3A-35-41|88-A2-9E'
 ```
 
+<br />
 ![image](https://github.com/user-attachments/assets/22b10f65-73d3-482c-a5fa-fe30eee0c08e)
+<br />
+
 <br />
 # Wrapping it All Up
 <br />
+
 Okay so that just kept going. WAY longer than I anticipated, but I wanted to do my best at an authoritative guide. Ultimately, the detection of DPRK-linked laptop farms and remote worker schemes requires defenders to look beyond traditional indicators of compromise and start asking different questions—about infrastructure, behavior, and access. These campaigns aren’t just about malware or phishing; they’re about deception at scale, often executed in ways that blend seamlessly with legitimate remote work. By combining endpoint telemetry, LAN observations, hardware footprinting, and creative pivots like BSSID geolocation or ARP sniffing, we can begin to expose patterns that might otherwise go unnoticed. This isn’t about catching every instance—it’s about shrinking the haystack, understanding the tradecraft, and spotting the anomalies that point to something bigger.
