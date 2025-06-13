@@ -732,7 +732,7 @@ Subsequently, this does offer us an opportunity to speculate as to how this migh
 
 Conceivably, it would look something like this on Windows, in which the two short commands to write to /dev/hidg0 would be a simple CMD run (WIN+R) to a preconfigured Zoom meeting direct-to-url, followed by a simple button press of the ENTER key:
 
-![image](https://github.com/user-attachments/assets/b5763549-175d-4b81-a4e7-351fbecce98d)
+![image](https://github.com/user-attachments/assets/5f277f00-8fd7-469e-9283-6d4ee9065592)
 <br />
 
 It is maddeningly simple and virtually indistinguishable from normal traffic. That said, this would also suggest a relatively sophisticated setup effort on the part of DPRK operators, which would need to ship multiple RasPi Zeros and MicroSDs to a laptop farm, and subsequently instruct the farmer to download (likely) preconfigured OSes to each MicroSD. These would need to be trivially preconfigured with the Python code that includes the /dev/hidg0 inputs and at least one with the WebSocket C2. From there, it’s just plug and play.
