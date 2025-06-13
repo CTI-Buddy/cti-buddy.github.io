@@ -1,19 +1,19 @@
 ---
 layout: post
 title: "Catching North Koreans & Laptop Farms"
-date: 2025-06-02
+date: 2025-06-13
 tagline: "Detection Techniques for Farms on Your Network"
 image: /IMG/060225.jpg
 tags: [Threat Intelligence, Threat Hunting, Threat Analysis]
 ---
 
 Since it is the flavor of the last few months and many are talking about it, I thought I would try to throw together all the detection techniques I could for catching DPRK worker schemes. I’ve also noticed that most are talking about techniques for catching them before they get hired – not many are talking about catching the ones that may already be working for them. So as a result, have a long blog post.
+<br /><br />
 
-<br />
 Background: North Korea’s Remote Worker Deception
 ==============================================
-<br />
 
+<br />
 In recent years, the U.S. government has publicly warned of a quiet but sophisticated campaign by North Korea to infiltrate the global tech workforce—not with malware, but with people. According to joint advisories from the FBI, Department of State, and the Department of the Treasury, the DPRK has deployed thousands of highly skilled IT professionals to work remotely for companies worldwide. Disguised as freelance developers or contractors, these operatives aim to generate revenue for the North Korean regime while gaining access to potentially sensitive technologies and internal corporate systems.
 
 The scheme is both clever and troubling. These remote workers often present forged documents, including fake U.S. passports or stolen identities, to create credible profiles on platforms like LinkedIn, Upwork, and GitHub. Their resumes typically show legitimate-sounding job histories and technical skills—Python development, mobile app engineering, blockchain smart contracts. Many even go as far as staging video calls with manipulated visuals or avatars to mask their real identities. Payment is often laundered through intermediaries, crypto wallets, or foreign bank accounts, making detection especially challenging.
@@ -58,7 +58,9 @@ So the overall intent of this post is to iterate through a few technical indicat
 
 I’ll start with some of the easier stuff that most fleet systems shouldn’t have enabled in the first place, or at least be tightly controlled. Applications like AnyDesk or enabled RDP are generally basic steps most SOCs should have detection logic in place already, but for posterity let’s run through a few. At first, I leaned towards not mentioning this stuff as it felt a bit basic and would end up cluttering the post – however, when I outlined this post out it felt incomplete without including this. If you’re familiar with detecting these or have them outright disallowed in your network, feel free to just skip through this portion.
 
+<br />
 ## Remote Desktop Protocol (RDP)
+<br />
 
 RDP is Microsoft's proprietary protocol for remote desktop access, built into Windows systems by default. It allows full desktop control over TCP port 3389 and is often the first choice for managing Windows machines remotely due to its native integration and performance. If you haven’t chased this down in a lab exercise or in a live SOC environment, there’s a few different ways you might catch this. Here’s some Powershell to start:
 
@@ -69,25 +71,26 @@ RDP is Microsoft's proprietary protocol for remote desktop access, built into Wi
 
 Get-Service TermService | Select-Object Status, StartType
 ```
-
+<br />
 **What it does:**
+<br />
 
 - Queries the **"Remote Desktop Services"** Windows service (named TermService).
 - Displays its **Status** (e.g., Running, Stopped) and **StartType** (e.g., Automatic, Manual, Disabled).
-
+<br />
 **Why it's useful:**  
 
 This tells you whether RDP is enabled and running on the machine. If TermService is **running and set to start automatically**, the system is likely accepting incoming RDP connections.
-
+<br />
 ```powershell
 qwinsta /server:localhost
 ```
-
+<br />
 **What it does:**
 
 - qwinsta (Query WINdows STAtion) lists all active **Remote Desktop sessions** on the local machine.
 - Shows session ID, user name, session state (Active/Disconnected), and type (console/rdp-tcp).
-
+<br />
 **Why it's useful:**
 This gives you **live visibility** into current or recently disconnected RDP sessions, which can help detect unauthorized or suspicious remote access.
 
