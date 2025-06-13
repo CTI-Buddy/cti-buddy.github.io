@@ -760,23 +760,27 @@ Honestly.. yes? Kind of? If the Sygnia code is consistent across this operation,
 - If the HID device simulates Win+R followed by zoommtg://...:
     - **CrowdStrike would likely log this as a cmd.exe-less user shell invocation** or explorer.exe launching a URI.
     - Look for child processes of explorer.exe or RuntimeBroker.exe without a parent cmd.exe.
+
 <br />
 **2\. Foreground Window Change / Shell Execution**
 
 - EDRs often capture shell execution events, even if no binary is dropped.
 - The HID input will make Zoom the foreground app — this may be correlated with a zoom.exe process spawning immediately after an untyped shell interaction.
+
 <br />
 **3\. Unusual Input Sequences**
 
 - If the HID device is used **without the user's interaction**, the pattern of keystrokes (e.g., Win+R, short delay, URI, Enter) could look anomalous:
     - Especially if it happens consistently at the same time.
     - Or if it happens when the user is marked as inactive.
+
 <br />
 **4\. Zoom Process Activity**
 
 - CrowdStrike will definitely track zoom.exe execution:
     - If it runs with unusual parent-child relationships (e.g., no clear originating app or script).
     - Or if it happens without any keyboard or mouse input from a real user.
+
 
 <br />
 **Detection Strategy Example (Pseudo Falcon Query Syntax)**
