@@ -10,9 +10,77 @@ permalink: /cybernews/
     Curated RSS feed of Cyber news via aggressive keyword filtering to try and sort out the noise.  It's a pretty handy daily reader.
   </p>
     <div class="feed-container" style="margin-top: 2rem;">
-<script type="text/javascript" src="https://feed.informer.com/widgets/CKCLVJQYCY.js"></script>
-<noscript><a href="https://feed.informer.com/widgets/CKCLVJQYCY.html">"Cyber News RSS Widget"</a>
-Powered by <a href="http://feed.informer.com/">RSS Feed Informer</a></noscript>
+<style>
+ul#nation {
+  margin: 0 0 12px 0;
+  padding: 10px;
+  width: 500px;
+  background: #20475d;
+  list-style: none;
+}
+ul#nation li {
+  color: #fff;
+  margin: 0 0 1.5em 0;
+  font: normal 12px/14px Calibri, sans-serif;
+}
+ul#nation li img.feed_informer_first_image {
+  max-width: 202px;
+  height: auto;
+  border: 1px solid #2d96ce;
+  margin: 4px 0;
+}
+ul#nation li div.title {
+  color: #2d96ce;
+  margin: 0 0 0.5em 0;
+  font: bold 14px 'Calibri', sans-serif;
+}
+ul#nation li div.title a {
+  text-decoration: none;
+  color: #2d96ce;
+}
+ul#nation li div.title a:hover {
+  text-decoration: underline;
+}
+ul#nation li a {
+  color: #fff;
+  text-decoration: underline;
+}
+</style>
+
+<div id="rss-widget">
+  <ul id="nation">
+    <li>Loading feed...</li>
+  </ul>
+</div>
+
+<script>
+const feedUrl = encodeURIComponent("https://www.pipes.digital/feed/VqaGEjNJ?");
+const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${feedUrl}`;
+
+fetch(apiUrl)
+  .then(response => response.json())
+  .then(data => {
+    const container = document.querySelector('#nation');
+    container.innerHTML = ''; // Clear "Loading..." text
+
+    data.items.slice(0, 5).forEach(item => { // show latest 5 items
+      const published = new Date(item.pubDate).toLocaleDateString();
+      const listItem = document.createElement('li');
+      listItem.innerHTML = `
+        <div class="title">
+          <a href="${item.link}" target="_blank">${item.title}</a>
+        </div>
+        <div style="margin: 0 0 0.3em 0; font-weight: bold">Published: ${published}</div>
+        <div>${item.description.substring(0, 300)}...<br><a target="_blank" href="${item.link}">read more</a></div>
+      `;
+      container.appendChild(listItem);
+    });
+  })
+  .catch(err => {
+    document.querySelector('#nation').innerHTML = `<li>Error loading feed.</li>`;
+    console.error("RSS Fetch Error:", err);
+  });
+</script>
     </div>
   </div>
 </section>
