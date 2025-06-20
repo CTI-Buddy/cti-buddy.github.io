@@ -6,69 +6,15 @@ permalink: /cybernews/
 <section class="section" style="background-color: var(--darker); border-top: 1px solid var(--gray);">
   <div class="container">
     <h2 class="section-title">&gt; cyber_news</h2>
-      <p style="color: #ffffff; font-family: 'Century Gothic', Courier, monospace; font-size: 1.25rem; line-height: 1.5;">
-    Curated RSS feed of Cyber news via aggressive keyword filtering to try and sort out the noise.  It's a pretty handy daily reader.
-  </p>
+    <p style="color: #ffffff; font-family: 'Century Gothic', Courier, monospace; font-size: 1.25rem; line-height: 1.5;">
+      Curated RSS feed of Cyber news via aggressive keyword filtering to try and sort out the noise. It's a pretty handy daily reader.
+    </p>
     <div class="feed-container" style="margin-top: 2rem;">
-<style>
-.feed-entry {
-  color: #ccc;
-  border-bottom: 1px solid #444;
-  margin-bottom: 12px;
-  padding-bottom: 10px;
-  font-family: 'Courier New', Courier, monospace;
-}
-.feed-entry a {
-  color: #a8ff60;
-  text-decoration: none;
-}
-.feed-entry a:hover {
-  text-decoration: underline;
-}
-.feed-entry .date {
-  color: #ffffff;
-  font-size: 0.875rem;
-  font-style: italic;
-}
-</style>
-
-<div id="rss-widget">
-  <div id="rss-items">
-    <p style="color: #ccc;">Loading feed...</p>
-  </div>
-</div>
-
-<script>
-const feedUrl = encodeURIComponent("https://www.pipes.digital/feed/VqaGEjNJ");
-const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${feedUrl}`;
-
-fetch(apiUrl)
-  .then(res => res.json())
-  .then(data => {
-    const container = document.getElementById('rss-items');
-    container.innerHTML = ''; // clear loading message
-
-    data.items.slice(0, 25).forEach(item => {
-      const date = new Date(item.pubDate);
-      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      const formattedDate = date.toLocaleDateString(undefined, options);
-
-      const div = document.createElement('div');
-      div.className = 'feed-entry';
-      div.innerHTML = `
-        <big><a href="${item.link}" target="_blank">${item.title.substring(0, 80)}</a></big><br />
-        <span class="date">${formattedDate}</span><br /><br />
-        ${item.description.replace(/(<([^>]+)>)/gi, '').substring(0, 300)} .. 
-        <a href="${item.link}" target="_blank">read more..</a>
-      `;
-      container.appendChild(div);
-    });
-  })
-  .catch(err => {
-    console.error("Feed error:", err);
-    document.getElementById('rss-items').innerHTML = '<p style="color: red;">Error loading feed.</p>';
-  });
-</script>
+      <script type="text/javascript" src="https://feed.informer.com/widgets/CKCLVJQYCY.js"></script>
+      <noscript>
+        <a href="https://feed.informer.com/widgets/CKCLVJQYCY.html">Cyber News Feed</a>
+        Powered by <a href="http://feed.informer.com/">RSS Feed Informer</a>
+      </noscript>
     </div>
   </div>
 </section>
