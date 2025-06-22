@@ -46,6 +46,7 @@ It’s important to clarify that while this setup still relies on separate cloud
 |:--:| 
 | *Come on in* |
 
+<br> 
 
 To an attacker, logging into a convincingly branded Okta portal using a ```@yourcorp.com``` identity and landing in a dashboard full of "legitimate" apps feels authentic, even though they’re in a sandboxed trap you control end-to-end.  In other words, setting up another Azure tenant (```company.onmicrosoft.com``` vs ```company-hub.onmicrosoft.com```) might look a little suspect, but using an external IdP allows for some creativity in the deception, like presenting a login portal at login.company-secure.net that (critically) **_accepts ```@company.com```_** **_usernames,_** mimics your corporate branding, and leads to a fake SSO dashboard with tiles for “Internal VPN,” “Admin Console,” and “HR Portal”, all pointing to isolated infrastructure designed to monitor and log attacker behavior.  You would want to closely mimic your real environment, not necessarily for realism (though still a factor), but for your own intelligence collection purposes.  You want to know what the attacker is particularly interested about in your resources, whether that is data exfiltration, establishing long-term persistence, or any other tactics you can understand from their logged behavior.
 
