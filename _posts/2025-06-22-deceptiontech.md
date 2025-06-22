@@ -70,6 +70,7 @@ Start by logging into the **Workforce Identity Developer Edition**  tenant you
 | ![image](https://github.com/user-attachments/assets/0373eddc-b306-4f6d-b255-26603fedf1ea) | 
 |:--:| 
 | *Mr. Wonka will NOT be pleased* |
+<br> 
 
 Next, move to **Directory ➜ People** and start seeding your honeypot identities. Mimic the job titles and departmental email prefixes your real users would have, ```vpn.engineer@yourcorp.com```, ```it.helpdesk@yourcorp.com```, maybe even ```cfo.office@yourcorp.com```, but keep passwords intentionally weak or recycled (e.g., ```Summer2025!```). Keep in mind you will more than likely be using fake, created personas that exist only for this tenant.  You could mimic real users, but this will require some coordination with your organization (this should be happening anyway!), ensuring no legitimate users stumble upon your honeynet and attempt to use it.  If you want extra realism, schedule a tiny automation (Okta Workflows or an external script) that logs each account in once a day; a bit of baseline “noise” helps fool both bots and humans.
 
@@ -77,7 +78,7 @@ Next, move to **Directory ➜ People** and start seeding your honeypot identit
 | ![image](https://github.com/user-attachments/assets/346a7b10-c716-45ff-9641-e1cde6075b60) | 
 |:--:| 
 | *Typical nepotism at work* |
-
+<br> 
 
 With users in place, head over to **Applications ➜ Applications ➜ Create App Integration**. For lightweight traps, choose **Bookmark App**, it’s nothing more than a tile that points to a URL (your static HTML dummy VPN login, fake Jira splash screen, or canary token document share). For higher interaction lures, pick **OIDC → Web App** or **SAML 2.0**, paste in the ACS/redirect URL of your honeynet service, and accept the default settings. Either way, upload the official icon of the product you’re spoofing (the [Jenkins logo](https://www.jenkins.io/), the GitHub [Octocat](https://github.com/octocat), the “lock” glyph from [GlobalProtect](https://www.paloaltonetworks.com/sase/globalprotect)) so the dashboard feels crowded with recognizable corporate tooling. Finally, assign each app to **Everyone**, as there’s no need to segregate apps (unless you want to), and verify you can sign in end to end with a test account.  For high-interaction lures, you’ll be configuring the SSO for passthrough authentication.  You want the attacker to think they’ve gotten all the keys through your Okta dashboard.  This obviously will take quite a bit of effort to build on the backend, and we’ll cover that further down.
 
@@ -85,22 +86,25 @@ With users in place, head over to **Applications ➜ Applications ➜ Create
 | ![image](https://github.com/user-attachments/assets/31d2d9a0-572e-49bb-abb1-9345fae91e2c) | 
 |:--:| 
 | *Mixing fake apps with real-ish ones is easy with tiles* |
+<br> 
  
 The last mile is **telemetry**. In the developer tier you can’t enable log streaming, but the System Log API is wide open. Create an API token (**Security ➜ API ➜ Tokens**) and point a small Lambda or Azure Function at the ```/api/v1/logs``` endpoint every few minutes; ship the JSON events into Sentinel, Elastic, or even a simple SQLite file. You’ll capture who hit the login page, which account they tried, whether MFA was challenged, and, most importantly, exactly which dummy app tile they clicked next. Tie that to web server logs from the backend honeynet VMs and you now have a full, timestamp aligned picture of every step the intruder takes from “Okta credential spray” to “lateral movement recon”, all without exposing a single production asset.
 
 |  ![image](https://github.com/user-attachments/assets/97de6011-feb0-44e0-9a89-f8d4637d6d50) | 
 |:--:| 
 | *Simple export to SIEM or your choice of reviewer* |
-
+<br> 
 
 ### A Note on Lightweight Custom Apps
 
+<br> 
 As mentioned, the easiest way to populate your honeynet dashboard is with **lightweight, static decoy apps**, simple HTML pages that mimic login portals, internal tools, or document shares. These pages don’t need to do anything beyond looking plausible; their value lies in what gets clicked, what gets typed, and what behavior follows. That’s often more useful than a high-fidelity backend, especially if your goal is signal over spectacle.
 But realism without control can backfire. If an attacker discovers your dummy GitHub portal or VPN login directly, say, by stumbling onto it via Shodan or running recon across a cloud IP range, that click doesn't tell you much. Worse, you lose context: was the attempt part of your honeynet campaign, or just noise?
 
 To enforce flow and context, it's worth applying access restrictions at the web server layer, and NGINX makes this easy. A simple ```nginx.conf``` rule that checks for a valid Referer (i.e., traffic must originate from your Okta honeynet portal) ensures that your static apps only respond to requests coming through the path you’ve designed. This way, you maintain ownership over the attacker’s journey, and any interaction with your apps inherently implies they compromised one of your fake accounts and successfully navigated the SSO flow, raising the value and fidelity of the telemetry you collect. In short, _don’t let attackers just trip over your bait_.  Make them move through the funhouse you have built for them.
 
 That NGINX config could look something like this:
+<br> 
 
 ```nginx
 server {
@@ -124,23 +128,29 @@ server {
     }
 }
 ```
+<br> 
 
 ## Another Benefit: Account Diversity
 
+<br> 
 One of the underappreciated advantages of using an external identity provider like Okta is the ability to **diversify your honeypot accounts** to mirror the messiness of a real enterprise. Not every attacker gets tripped up by a brute-force trap, as many are testing identity posture, probing for weak MFA enforcement, or just waiting for someone to tap “Approve” out of fatigue. In this setup, you can configure some honeypot accounts with simple username/password access to simulate technical debt or legacy applications, while enrolling others in MFA via Okta Verify. These MFA-enabled accounts can be paired to defender-controlled mobile devices or emulators, allowing you to **manually approve logins after repeated push attempts**. The result is a controlled environment for studying attacker behavior under real-world conditions, including tactics like MFA bombing, while maintaining full containment and visibility. Just be aware that Okta Verify only allows one account per tenant to be active per device, so scaling this technique will require multiple devices, emulators, or thoughtful rotation.
 
 ### Tools & Tips: Managing MFA Simulation at Scale
 
+<br> 
 Because Okta Verify only supports one account per org per device, scaling out push-based honeypot accounts takes a little planning. Fortunately, you’ve got options:
 
 * **Emulators:** Tools like [Android Studio](https://developer.android.com/studio) or [Genymotion](https://www.genymotion.com/) let you spin up multiple virtual Android devices, each running its own instance of Okta Verify. Perfect for testing multiple honeypot accounts in parallel.
+  
 * **Burner Devices:** Older phones or tablets can serve as physical Okta Verify clients. This works well if you're running a persistent honeynet and want a low-maintenance setup.
+  
 * **Account Rotation:** If you're simulating one attacker flow at a time, you can reassign Okta Verify enrollment between honeypot accounts as needed. It’s slower, but keeps things simple.
 
 So in order to diversify what you can catch in the initial access phase, it’s valuable to mix in the brute-forceable password logins with a few MFA pushes.  The additional level of effort that comes with push spam also can assist an analyst in potentially differentiating between spray-and-pray trash that hits everyone versus an adversary that may have a targeted interest in your organization specifically.  I’d say it’s worth the extra effort to set this up for at least a few accounts.
 
 ## Counterintelligence Considerations
 
+<br> 
 This leads to another benefit.  If your honeynet is designed to attract not just random opportunists but more deliberate threat actors, it’s worth thinking beyond simple traps and toward **controlled leaks and counterintelligence**. One effective technique is to intentionally expose certain honeypot user credentials, either in staged breach data, fake GitHub repos, or dark web-adjacent paste sites, to simulate a realistic compromise. This not only helps test how attackers consume leaked data, but also gives you a chance to observe how they behave with partial access, particularly when MFA stands in their way.
 
 For example, let’s say you've configured your honeypot accounts with TOTP-based MFA and assigned each a dummy phone number (using a burner SIM, Twilio, or Google Voice). If a threat actor gains the username, successfully sprays the password, but can’t log in without the 6-digit code, you may observe them **attempting to phish the code directly**. This could take the form of SMS messages impersonating IT support (_“Please reply with your login code to confirm your identity”_) or calls asking the “employee” to read their MFA prompt. If you’re logging both authentication attempts and incoming communications to the defender-controlled honeypot number, you’ll have visibility into the entire sequence — from credential use to social engineering follow-up.  A “leaked” employee list with a mobile number accomplishes this cleanly. 
@@ -151,13 +161,14 @@ Essentially the concept here is known as [“leak seeding”](https://en.wikiped
 
 ## Possible App Layer Options
 
+<br> 
 This is where you can get really creative, but for the purposes of this writeup, I’ll stick to as many free options as I can.  So once you’ve stood up your Okta identity layer and configured a handful of honeypot users, the next step is to give those users somewhere to go. In a real enterprise environment, authenticated users land on a dashboard with icons for internal tools, productivity suites, or admin consoles. We want to recreate that same experience for our fake users, and by extension, for any attacker who manages to log in.
 
 
 |  ![image](https://github.com/user-attachments/assets/d7a477c5-67e0-4bbe-bf2c-612af5cac1c2) | 
 |:--:| 
 | *Some of these are fake custom built HTML, some are real.  Can you tell which is which?* |
-
+<br> 
  
 This is where **static web apps**  come in. While they aren’t full-blown enterprise tools under the hood, they can look convincing enough to fool an attacker into interacting. For example, you can clone the look and feel of SharePoint Online using a simple HTML/CSS template and deploy it to a free-tier Azure Static Web App or Cloudflare Pages site. These platforms let you host and serve static content globally, often with built-in CI/CD from GitHub, making it easy to spin up or tear down environments at will. Each fake app, whether it’s “SharePoint,” “VPN Console,” or “IT Admin Portal”,  should live at its own endpoint, with URLs like ```https://sharepoint-secure.pages[.]dev```  or ```https://internal-console.azurestaticapps[.]net```.  This would look sketchy under normal circumstances, but we’re relying on the added legitimacy that Okta has afforded us via our faked login portal and dashboard.  Additionally, the custom bookmark app afforded by Okta means you can dress these up to look like real Sharepoint, but the attacker will be accessing a simple html with file host clone.  This took me less than 10 minutes to build, with each link mapping to a CanaryToken-ed dummy document.  You can imagine what is feasible in a day or a week of building:
  
@@ -165,12 +176,13 @@ This is where **static web apps**  come in. While they aren’t full-blown enter
 |  ![image](https://github.com/user-attachments/assets/d7f2ce85-d35f-4d68-a47e-950f4b2f335d) | 
 |:--:| 
 | *Real enough - but you can really sell it with some more effort* |
-
+<br> 
 
 With that said, static content alone obviously isn’t enough. You also need to control access. If someone stumbles upon one of your fake apps via Google, a misconfigured DNS entry, or a leaked URL, you don’t want them bypassing your Okta SSO trap. To enforce this, you can use a lightweight **JavaScript referrer check**. This script examines the ```document.referrer``` header and automatically redirects or blocks access if the visitor didn’t come through the legitimate Okta dashboard. It’s not a foolproof defense (attackers can spoof headers), but it does provide a useful gating mechanism that reinforces the illusion: real users go through Okta; anyone else gets kicked out. If you’re using Cloudflare Pages, you can bolster this even further by writing firewall or page rules that restrict traffic based on referrer headers, all without touching server-side code.
 
 ## Turning Fake Apps into Intelligence Assets
 
+<br> 
 Now that your attacker has landed inside a visually realistic fake app, the goal is to observe what they try to do. Do they browse a file repository? Try to download documents? Look for admin panels or submit forms? One easy way to capture this behavior is by seeding your static sites with **Canarytokens**: free, prebuilt traps that alert you when interacted with.
 
 For example, [Canarytokens.org](Canarytokens.org) allows you to generate Word or Excel files that “call home” when opened, as well as web bug tokens, DNS beacons, and even cloned login forms. You might embed a fake Excel spreadsheet called ```2024-Bonus-Projections.xlsx``` in your SharePoint clone, or link to a "VPN credentials export" that’s actually a Canarytoken-powered PDF. These serve not just as decoys but as telemetry producers. Once clicked, they’ll send alerts to your inbox or webhook endpoint, giving you visibility into what piques an attacker’s interest. That insight can inform everything from SOC alert tuning to phishing lure design to credential stuffing detection rules.
@@ -179,6 +191,7 @@ If you want to go deeper, you can add logging to the static apps themselves via 
 
 ## Monitoring the Funnel: From Login to Lure
 
+<br> 
 Your deception technology solution should tell a story, and that means correlating data from multiple layers. Okta provides detailed logs for user logins, failed password attempts, and MFA prompts, which can show you exactly how an attacker gained access and what tactics they used. If you’ve configured some honeypot accounts with password-only access and others with MFA, you’ll be able to see whether they spray common passwords across accounts, attempt MFA fatigue attacks, or skip accounts that require a second factor.
 
 Downstream, you’ll receive alerts from your Canarytokens when files are opened or forms are submitted, completing the picture. You can correlate “User X authenticated via Okta” with “User X accessed the SharePoint tile,” followed by “User X triggered a canary document alert”, with user telemetry from Cloudflare Workers.  That kind of kill-chain visibility is nearly impossible to get from traditional honeypots.
@@ -187,6 +200,7 @@ Best of all, all of these components live outside your real infrastructure. Okta
 
 ## Further Maturity: Getting into Full-Fledged Virtual Honeynets
 
+<br> 
 As your deception setup matures and you begin to demand deeper interaction or greater realism, you may find yourself moving beyond static sites and lightweight telemetry. This is where traditional compute platforms like **AWS EC2** or **Azure VMs** come into play. While these options typically introduce some cost, they also open the door to high-interaction honeypots.  These are systems that can fully emulate services like SSH, RDP, web apps, or even internal admin tools. Running full operating systems in isolated cloud environments allows you to capture everything from command execution and lateral movement attempts to file uploads and privilege escalation behaviors.  
 
 I won’t get into technical walkthroughs as these are very well covered elsewhere. I would recommend the [AWS guide](https://aws.amazon.com/blogs/security/how-to-detect-suspicious-activity-in-your-aws-account-by-using-private-decoy-resources/) to start, as well as deeper dives from [Steve Gathof](https://medium.com/@sudojune/deploying-a-honeypot-on-aws-5bb414753f32) and [BohanSec](https://bohansec.com/2023/11/28/Deploy-T-Pot-Honeypot-To-AWS/). The latter two utilize heavy usage of [T-Pot](https://github.com/github-rashelbach/-T-Pot-Honeypot), a T-Mobile multi-honeypot solution that is easy to standup in a solution like AWS EC2.
@@ -195,6 +209,7 @@ I won’t get into technical walkthroughs as these are very well covered elsewhe
 |  ![image](https://github.com/user-attachments/assets/ce85509a-f24b-49e1-9b8f-5dd6abe4cc64) | 
 |:--:| 
 | *Putting the T-Pot on* |
+<br> 
 
 So imagine you deploy T-Pot on an AWS EC2 instance, but instead of exposing it to the open internet like most public T-Pot deployments, you lock it behind a fake VPN tile in your Okta SSO dashboard. This means the only path to the honeypot is through a seemingly legitimate @yourcorp.com identity and an SSO login page that mirrors your corporate branding.
 Once “logged in,” the attacker is presented with what looks like a corporate VPN or internal access portal, which silently proxies them to the T-Pot interface or forwards traffic to the EC2 instance via a private listener. The attacker now believes they’ve made it past the perimeter and are sitting on internal infrastructure, all while you’re collecting telemetry across every emulated service, from SSH and SMB to ElasticPot and Honeytrap.
@@ -203,19 +218,23 @@ Once “logged in,” the attacker is presented with what looks like a corporate
 |  ![image](https://github.com/user-attachments/assets/8e5fc552-f10e-40c5-94dc-29128e8b3ce9) | 
 |:--:| 
 | *The Gold Standard* |
-
+<br> 
 
 **Why this is better than an open honeypot:**
 
 * **Targeted access** – You can control who reaches the honeypot and under what conditions. Open honeypots get flooded with mass scans; this setup filters for more targeted activity (e.g., credential stuffing, phishing).
+  
 * **Realism without risk** – From the attacker’s view, they walked in through a real SSO portal and landed inside the network. From your side, everything is fake and instrumented.
+  
 * **Identity-layer telemetry** – You capture login attempts, password spray, MFA spam, and app selection before a single packet hits the honeypot—critical intel that’s invisible in traditional T-Pot deployments.
+  
 * **Controlled kill chain** – By staging access through Okta, you decide which apps, systems, and services the attacker can “find” next. It’s a curated deception path, not a junkyard of unguarded bait.
 
 Overall, this finely tunes your captured telemetry.  Where an open honeypot infrastructure will see a lot of drive-by opportunism, this approach filters attacker behavior to just those specifically interested in your organization enough to overcome the barriers you placed in front of this infrastructure.  Now you can see what exactly happens and what exactly an adversary is interested in, as well as their level of sophistication, should they actually breach your network.  
 
 ## Wrapping It All Up: Deception as a Force Multiplier
 
+<br> 
 The reality is that attackers are getting smarter, stealthier, and more tailored in their operations, so your defenses should be too. What this blog post has outlined is a way to trap bad actors, but also a way to transform your cloud presence into a source of intelligence. By building a deception environment around external identity providers like Okta, isolating infrastructure in sandboxed tenants, and layering in believable static or interactive lures, you turn passive decoys into active sensors. This approach is preferred because it doesn’t just tell you _that_ someone knocked on your door; it tells you _who_, _how_, and _why_.
 
 And crucially, it does all this without needing enterprise-grade security budgets or specialized software. Most of the building blocks, like Azure, Cloudflare, Okta, static site hosting, even alerting pipelines are free or already available in your environment. The key is combining them strategically, with just enough realism to attract interest, and just enough control to stay safe.
