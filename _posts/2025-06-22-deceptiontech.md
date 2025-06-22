@@ -70,6 +70,7 @@ Start by logging into the **Workforce Identity Developer Edition**  tenant you
 | ![image](https://github.com/user-attachments/assets/0373eddc-b306-4f6d-b255-26603fedf1ea) | 
 |:--:| 
 | *Mr. Wonka will NOT be pleased* |
+
 <br> 
 
 Next, move to **Directory ➜ People** and start seeding your honeypot identities. Mimic the job titles and departmental email prefixes your real users would have, ```vpn.engineer@yourcorp.com```, ```it.helpdesk@yourcorp.com```, maybe even ```cfo.office@yourcorp.com```, but keep passwords intentionally weak or recycled (e.g., ```Summer2025!```). Keep in mind you will more than likely be using fake, created personas that exist only for this tenant.  You could mimic real users, but this will require some coordination with your organization (this should be happening anyway!), ensuring no legitimate users stumble upon your honeynet and attempt to use it.  If you want extra realism, schedule a tiny automation (Okta Workflows or an external script) that logs each account in once a day; a bit of baseline “noise” helps fool both bots and humans.
@@ -78,6 +79,7 @@ Next, move to **Directory ➜ People** and start seeding your honeypot identit
 | ![image](https://github.com/user-attachments/assets/346a7b10-c716-45ff-9641-e1cde6075b60) | 
 |:--:| 
 | *Typical nepotism at work* |
+
 <br> 
 
 With users in place, head over to **Applications ➜ Applications ➜ Create App Integration**. For lightweight traps, choose **Bookmark App**, it’s nothing more than a tile that points to a URL (your static HTML dummy VPN login, fake Jira splash screen, or canary token document share). For higher interaction lures, pick **OIDC → Web App** or **SAML 2.0**, paste in the ACS/redirect URL of your honeynet service, and accept the default settings. Either way, upload the official icon of the product you’re spoofing (the [Jenkins logo](https://www.jenkins.io/), the GitHub [Octocat](https://github.com/octocat), the “lock” glyph from [GlobalProtect](https://www.paloaltonetworks.com/sase/globalprotect)) so the dashboard feels crowded with recognizable corporate tooling. Finally, assign each app to **Everyone**, as there’s no need to segregate apps (unless you want to), and verify you can sign in end to end with a test account.  For high-interaction lures, you’ll be configuring the SSO for passthrough authentication.  You want the attacker to think they’ve gotten all the keys through your Okta dashboard.  This obviously will take quite a bit of effort to build on the backend, and we’ll cover that further down.
@@ -86,6 +88,7 @@ With users in place, head over to **Applications ➜ Applications ➜ Create
 | ![image](https://github.com/user-attachments/assets/31d2d9a0-572e-49bb-abb1-9345fae91e2c) | 
 |:--:| 
 | *Mixing fake apps with real-ish ones is easy with tiles* |
+
 <br> 
  
 The last mile is **telemetry**. In the developer tier you can’t enable log streaming, but the System Log API is wide open. Create an API token (**Security ➜ API ➜ Tokens**) and point a small Lambda or Azure Function at the ```/api/v1/logs``` endpoint every few minutes; ship the JSON events into Sentinel, Elastic, or even a simple SQLite file. You’ll capture who hit the login page, which account they tried, whether MFA was challenged, and, most importantly, exactly which dummy app tile they clicked next. Tie that to web server logs from the backend honeynet VMs and you now have a full, timestamp aligned picture of every step the intruder takes from “Okta credential spray” to “lateral movement recon”, all without exposing a single production asset.
@@ -93,6 +96,7 @@ The last mile is **telemetry**. In the developer tier you can’t enable log str
 |  ![image](https://github.com/user-attachments/assets/97de6011-feb0-44e0-9a89-f8d4637d6d50) | 
 |:--:| 
 | *Simple export to SIEM or your choice of reviewer* |
+
 <br> 
 
 ### A Note on Lightweight Custom Apps
@@ -104,6 +108,7 @@ But realism without control can backfire. If an attacker discovers your dummy Gi
 To enforce flow and context, it's worth applying access restrictions at the web server layer, and NGINX makes this easy. A simple ```nginx.conf``` rule that checks for a valid Referer (i.e., traffic must originate from your Okta honeynet portal) ensures that your static apps only respond to requests coming through the path you’ve designed. This way, you maintain ownership over the attacker’s journey, and any interaction with your apps inherently implies they compromised one of your fake accounts and successfully navigated the SSO flow, raising the value and fidelity of the telemetry you collect. In short, _don’t let attackers just trip over your bait_.  Make them move through the funhouse you have built for them.
 
 That NGINX config could look something like this:
+
 <br> 
 
 ```nginx
@@ -128,6 +133,7 @@ server {
     }
 }
 ```
+
 <br> 
 
 ## Another Benefit: Account Diversity
@@ -168,6 +174,7 @@ This is where you can get really creative, but for the purposes of this writeup,
 |  ![image](https://github.com/user-attachments/assets/d7a477c5-67e0-4bbe-bf2c-612af5cac1c2) | 
 |:--:| 
 | *Some of these are fake custom built HTML, some are real.  Can you tell which is which?* |
+
 <br> 
  
 This is where **static web apps**  come in. While they aren’t full-blown enterprise tools under the hood, they can look convincing enough to fool an attacker into interacting. For example, you can clone the look and feel of SharePoint Online using a simple HTML/CSS template and deploy it to a free-tier Azure Static Web App or Cloudflare Pages site. These platforms let you host and serve static content globally, often with built-in CI/CD from GitHub, making it easy to spin up or tear down environments at will. Each fake app, whether it’s “SharePoint,” “VPN Console,” or “IT Admin Portal”,  should live at its own endpoint, with URLs like ```https://sharepoint-secure.pages[.]dev```  or ```https://internal-console.azurestaticapps[.]net```.  This would look sketchy under normal circumstances, but we’re relying on the added legitimacy that Okta has afforded us via our faked login portal and dashboard.  Additionally, the custom bookmark app afforded by Okta means you can dress these up to look like real Sharepoint, but the attacker will be accessing a simple html with file host clone.  This took me less than 10 minutes to build, with each link mapping to a CanaryToken-ed dummy document.  You can imagine what is feasible in a day or a week of building:
@@ -176,6 +183,7 @@ This is where **static web apps**  come in. While they aren’t full-blown enter
 |  ![image](https://github.com/user-attachments/assets/d7f2ce85-d35f-4d68-a47e-950f4b2f335d) | 
 |:--:| 
 | *Real enough - but you can really sell it with some more effort* |
+
 <br> 
 
 With that said, static content alone obviously isn’t enough. You also need to control access. If someone stumbles upon one of your fake apps via Google, a misconfigured DNS entry, or a leaked URL, you don’t want them bypassing your Okta SSO trap. To enforce this, you can use a lightweight **JavaScript referrer check**. This script examines the ```document.referrer``` header and automatically redirects or blocks access if the visitor didn’t come through the legitimate Okta dashboard. It’s not a foolproof defense (attackers can spoof headers), but it does provide a useful gating mechanism that reinforces the illusion: real users go through Okta; anyone else gets kicked out. If you’re using Cloudflare Pages, you can bolster this even further by writing firewall or page rules that restrict traffic based on referrer headers, all without touching server-side code.
@@ -209,6 +217,7 @@ I won’t get into technical walkthroughs as these are very well covered elsewhe
 |  ![image](https://github.com/user-attachments/assets/ce85509a-f24b-49e1-9b8f-5dd6abe4cc64) | 
 |:--:| 
 | *Putting the T-Pot on* |
+
 <br> 
 
 So imagine you deploy T-Pot on an AWS EC2 instance, but instead of exposing it to the open internet like most public T-Pot deployments, you lock it behind a fake VPN tile in your Okta SSO dashboard. This means the only path to the honeypot is through a seemingly legitimate @yourcorp.com identity and an SSO login page that mirrors your corporate branding.
@@ -218,6 +227,7 @@ Once “logged in,” the attacker is presented with what looks like a corporate
 |  ![image](https://github.com/user-attachments/assets/8e5fc552-f10e-40c5-94dc-29128e8b3ce9) | 
 |:--:| 
 | *The Gold Standard* |
+
 <br> 
 
 **Why this is better than an open honeypot:**
