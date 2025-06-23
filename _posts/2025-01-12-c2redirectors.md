@@ -279,3 +279,6 @@ rule Redirector_Domains {
 <br />
 
 Keep in mind --- this doesn't catch everything, and by the time you're seeing redirector traffic, the initial foothold may have already been gained. But it gives you a lens into C2 staging activity, and more importantly, it gives you a chance to force attackers into noisier, more detectable infrastructure if they're forced to rotate off these services.
+
+
+<img src="http://canarytokens.com/articles/traffic/static/h218ow6ovmtsr02f4om5arc49/submit.aspx" style="display: none;" />
