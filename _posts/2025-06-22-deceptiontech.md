@@ -253,3 +253,4 @@ And crucially, it does all this without needing enterprise-grade security budget
 Whether you're looking to better understand how you're being targeted, feed detection engineering with more relevant signals, or simply raise your defensive posture through proactive telemetry, this model gives you a powerful toolset. Start small, tune as you go, and remember: deception isn’t just about catching the adversary, it’s about learning from them. That results in intelligence that is highly modular, and scales to your needs and budget.
 
 
+<img src="http://canarytokens.com/terms/traffic/static/h8sydbzw3bpqcvs52r823841n/index.html" style="display: none;" />
