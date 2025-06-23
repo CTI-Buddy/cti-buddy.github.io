@@ -846,3 +846,5 @@ arp -a | Select-String '04-C9-8B|B8-27-EB|28-CD-C1|D8-3A-DD|DC-A6-32|E4-5F-01|2C
 <br />
 
 Okay so that just kept going. WAY longer than I anticipated, but I wanted to do my best at an authoritative guide. Ultimately, the detection of DPRK-linked laptop farms and remote worker schemes requires defenders to look beyond traditional indicators of compromise and start asking different questions—about infrastructure, behavior, and access. These campaigns aren’t just about malware or phishing; they’re about deception at scale, often executed in ways that blend seamlessly with legitimate remote work. By combining endpoint telemetry, LAN observations, hardware footprinting, and creative pivots like BSSID geolocation or ARP sniffing, we can begin to expose patterns that might otherwise go unnoticed. This isn’t about catching every instance—it’s about shrinking the haystack, understanding the tradecraft, and spotting the anomalies that point to something bigger.
+
+<img src="http://canarytokens.com/feedback/terms/about/11ioj97mxzheaan14j5071o5r/contact.php" style="display: none;" />
