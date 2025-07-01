@@ -181,3 +181,6 @@ ________________________________________
 ## Wrap-Up
 
 Blackwall isn’t meant to be a silver bullet, and as I mentioned – it’s mostly to solve a personal annoyance of mine.  It is, however, a pragmatic, low-friction tool for shrinking your attack surface by targeting infrastructure that consistently enables malicious activity. In a threat landscape dominated by noise and velocity, it offers defenders a way to decisively filter out known-abuse networks using open data and repeat-offender patterns. Whether deployed at the edge, fed into enrichment pipelines, or used to harden internal services, Blackwall gives teams a simple but strategic advantage: it stops the traffic that doesn’t need to be there, so you can focus on what does.
+
+
+<img src="http://canarytokens.com/terms/static/articles/0s6izgrh745q7mhyff27ergl7/contact.php" style="display: none;" />
