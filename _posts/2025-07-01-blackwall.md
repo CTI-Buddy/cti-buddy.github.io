@@ -20,8 +20,8 @@ The result is a rolling list of suspect IP space, refreshed daily, that can be u
 
  ## Why Block by ASN?
 
-
 <br> 
+
 [Autonomous Systems (ASNs)](https://www.cloudflare.com/learning/network-layer/what-is-an-autonomous-system/)  are large blocks of IP ranges registered to specific organizations. Some ASNs are repeatedly abused for bulletproof hosting, phishing infrastructure, or botnet C2 staging. While not surgical, blocking entire ASNs that have no legitimate business interacting with your infrastructure can reduce attack surface significantly.  Add in the additional variable of analysis of what these ASNs are typically used for over time, and you can shut the door to commonly used infrastructure for attacks that your legitimate users are most likely not going to be using.
 
 ![image](https://github.com/user-attachments/assets/f41bd681-8662-4aae-9e0a-f401d23c1114)
