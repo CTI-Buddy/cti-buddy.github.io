@@ -16,9 +16,10 @@ Not every problem in cybersecurity needs to be solved with machine learning or a
 Sometimes the simplest defenses are the most effective, and that’s the idea behind building a lightweight, automated blocklist that merges known abusive IP ranges with dynamically resolved IPs tied to low-reputation ASNs. Many of the worst actors on the internet operate from network infrastructure that’s already well-known to threat researchers: entire IP ranges used for malware staging, spam, C2, or phishing kits. In many cases, these hostile networks have a consistent track record of abuse, questionable ownership, and minimal action in response to takedown requests.
 
 The result is a rolling list of suspect IP space, refreshed daily, that can be used with firewalls, proxies, or SIEM enrichment pipelines. It doesn’t try to do everything. It’s just a fast way to say “no” to the obvious.  And yes - it is a [Cyberpunk 2077 reference](https://cyberpunk.fandom.com/wiki/Blackwall).
-
+<br> 
 
  ## Why Block by ASN?
+
 
 <br> 
 [Autonomous Systems (ASNs)](https://www.cloudflare.com/learning/network-layer/what-is-an-autonomous-system/)  are large blocks of IP ranges registered to specific organizations. Some ASNs are repeatedly abused for bulletproof hosting, phishing infrastructure, or botnet C2 staging. While not surgical, blocking entire ASNs that have no legitimate business interacting with your infrastructure can reduce attack surface significantly.  Add in the additional variable of analysis of what these ASNs are typically used for over time, and you can shut the door to commonly used infrastructure for attacks that your legitimate users are most likely not going to be using.
