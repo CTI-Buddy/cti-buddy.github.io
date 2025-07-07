@@ -76,23 +76,27 @@ To contend with the rising challenge of ORB networks, defenders can leverage int
 Here's how Shodan and Censys can be utilized for this purpose:
 
 1. **Understand Their Data Collection**: Both Shodan and Censys map the Internet by scanning thousands of ports across the entire public IP range daily. They collect data on IP addresses, websites, certificates, open ports, and other network-related information, including operating systems, products, vendors, and even HTML content. Censys, for example, performs extended API calls against non-standard ports to detect running services.
+
+<br>
   
 2. **Bulk IP Address Lookup and Clustering**:
-    - **Collect Suspicious IPs**: Your network logs (e.g., firewall, SIEM, ADFS, Okta, Microsoft Entra ID) will show IPs involved in activities like high volumes of failed login attempts, attacks on unknown/invalid users, or unusual traffic patterns.
-    - **Automated Lookup**: Both Shodan and Censys offer API capabilities for programmatic lookups. **Shodan's Corporate API allows bulk lookups of up to 100 IPs per request**. Censys offers Get Host Details Using IP Address and Search Hosts actions.
-    - **Identify Commonalities**: Once you have the detailed reports for these IPs, look for:
-        - **Open Ports and Services**: Are there specific unusual or common open ports (e.g., 23/telnet, 21/ftp, 445/smb, 3389/rdp, or less common ones like 1337, 7777 or 4800) across multiple suspicious IPs?. This can indicate common ORB infrastructure or compromised IoT devices.
-        - **TLS Certificate Hashes**: You can search for and compare **SHA-256 fingerprints of TLS certificates** (services.tls.certificates.leaf_data.fingerprint_sha256 in Censys). [Identical certificate hashes](https://www.splunk.com/en_us/blog/security/ssl-tls-threat-hunting.html) across disparate IPs could indicate a common ORB operator setting up their nodes with the same certificate configurations.
-        - **Autonomous System Numbers (ASNs)**: ORB networks are globally distributed and diversify nodes by registering with multiple commercial Autonomous System providers. Using the asn:\[number\] filter in Shodan or autonomous_system.asn:\[number\] in Censys can help identify large ranges of IP addresses associated with known ORB operators or specific hosting providers frequently used by them (e.g., DigitalOcean, OVH SAS, Google Cloud).
-        - **Operating Systems, Products, and Vendors**: Look for common operating systems (operating_system.product:"Windows"), products (services.software.product:"OpenSSH"), or vendors (services.software.vendor:"Amazon"). Many ORB nodes are compromised IoT devices (e.g., routers from MikroTik, ASUS, Draytek).
-        - **Unique Service/Network Characteristics**: [Team Cymru](https://www.team-cymru.com/post/an-introduction-to-operational-relay-box-orb-networks-unpatched-forgotten-and-obscured) suggests looking for distinctive X.509 certificates.
-        - **HTML Banners/Titles**: Look for specific titles (http.title:"RouterOS router configuration page") or HTML content (http.html:'ua-1592615') that might fingerprint a specific type of compromised device or ORB operator's setup.
-        - **Screenshot Labels**: Shodan can capture screenshots of exposed web interfaces and label them (e.g., screenshot.label:webcam, screenshot.label:login, screenshot.label:ics). This can reveal exposed administrative interfaces.
-        - **Historical Data**: Shodan allows looking at the full history of an IP, showing all banners ever seen, which can help determine when a service was first exposed or how long a device has been online.
+       - **Collect Suspicious IPs**: Your network logs (e.g., firewall, SIEM, ADFS, Okta, Microsoft Entra ID) will show IPs involved in activities like high volumes of failed login attempts, attacks on unknown/invalid users, or unusual traffic patterns.
+       - **Automated Lookup**: Both Shodan and Censys offer API capabilities for programmatic lookups. **Shodan's Corporate API allows bulk lookups of up to 100 IPs per request**. Censys offers Get Host Details Using IP Address and Search Hosts actions.
+       - **Identify Commonalities**: Once you have the detailed reports for these IPs, look for:
+           - **Open Ports and Services**: Are there specific unusual or common open ports (e.g., 23/telnet, 21/ftp, 445/smb, 3389/rdp, or less common ones like 1337, 7777 or 4800) across multiple suspicious IPs?. This can indicate common ORB infrastructure or compromised IoT devices.
+           - **TLS Certificate Hashes**: You can search for and compare **SHA-256 fingerprints of TLS certificates** (services.tls.certificates.leaf_data.fingerprint_sha256 in Censys). [Identical certificate hashes](https://www.splunk.com/en_us/blog/security/ssl-tls-threat-hunting.html) across disparate IPs could indicate a common ORB operator setting up their nodes with the same certificate configurations.
+           - **Autonomous System Numbers (ASNs)**: ORB networks are globally distributed and diversify nodes by registering with multiple commercial Autonomous System providers. Using the asn:\[number\] filter in Shodan or autonomous_system.asn:\[number\] in Censys can help identify large ranges of IP addresses associated with known ORB operators or specific hosting providers frequently used by them (e.g., DigitalOcean, OVH SAS, Google Cloud).
+           - **Operating Systems, Products, and Vendors**: Look for common operating systems (operating_system.product:"Windows"), products (services.software.product:"OpenSSH"), or vendors (services.software.vendor:"Amazon"). Many ORB nodes are compromised IoT devices (e.g., routers from MikroTik, ASUS, Draytek).
+           - **Unique Service/Network Characteristics**: [Team Cymru](https://www.team-cymru.com/post/an-introduction-to-operational-relay-box-orb-networks-unpatched-forgotten-and-obscured) suggests looking for distinctive X.509 certificates.
+           - **HTML Banners/Titles**: Look for specific titles (http.title:"RouterOS router configuration page") or HTML content (http.html:'ua-1592615') that might fingerprint a specific type of compromised device or ORB operator's setup.
+           - **Screenshot Labels**: Shodan can capture screenshots of exposed web interfaces and label them (e.g., screenshot.label:webcam, screenshot.label:login, screenshot.label:ics). This can reveal exposed administrative interfaces.
+           - **Historical Data**: Shodan allows looking at the full history of an IP, showing all banners ever seen, which can help determine when a service was first exposed or how long a device has been online.
+
+<br>
 
 3. **Advanced Filtering (Paid Features)**:
-    - **Vulnerability Filters**: Shodan offers a vuln: filter (e.g., vuln:ms17-010) to find IPs vulnerable to [specific exploits](https://medium.com/@ofriouzan/advanced-shodan-use-for-tracking-down-vulnerable-components-7b6927a87c45), though this is often restricted to academic or business users.
-    - **Regex Queries**: Censys paid users can use [regular expressions](https://docs.censys.com/docs/platform-regex-cenql) to define complex search criteria, such as identifying patterns in HTTP response headers or service banners that might indicate proxy usage (services.http.response.headers.x_forwarded_for: /.\*,.\*/) or specific attack tools.
+       - **Vulnerability Filters**: Shodan offers a vuln: filter (e.g., vuln:ms17-010) to find IPs vulnerable to [specific exploits](https://medium.com/@ofriouzan/advanced-shodan-use-for-tracking-down-vulnerable-components-7b6927a87c45), though this is often restricted to academic or business users.
+       - **Regex Queries**: Censys paid users can use [regular expressions](https://docs.censys.com/docs/platform-regex-cenql) to define complex search criteria, such as identifying patterns in HTTP response headers or service banners that might indicate proxy usage (services.http.response.headers.x_forwarded_for: /.\*,.\*/) or specific attack tools.
 
 <br>
 
@@ -131,7 +135,7 @@ Here's a step-by-step guide on how an analyst would apply bulk data from a passw
 
 **2\. Query IP Addresses in Shodan (and Censys)** Once you have a list of suspicious IP addresses, you can use Shodan or Censys to gather information about the hosts.
 
-- **Individual IP Lookup (Shodan):** For single IPs, use the Shodan.host() method with your API key. For example: api.host('8.8.8.8'). You can also simply enter the IP into the Shodan.io search bar.
+   - **Individual IP Lookup (Shodan):** For single IPs, use the Shodan.host() method with your API key. For example: api.host('8.8.8.8'). You can also simply enter the IP into the Shodan.io search bar.
 
 <br>
 
@@ -139,19 +143,20 @@ Here's a step-by-step guide on how an analyst would apply bulk data from a passw
 
 <br>
 
-- **Bulk IP Lookups (Shodan):** If you have a corporate API key, Shodan allows you to look up up to 100 IPs per request by providing a list of IPs to the Shodan.host() method.
+   - **Bulk IP Lookups (Shodan):** If you have a corporate API key, Shodan allows you to look up up to 100 IPs per request by providing a list of IPs to the Shodan.host() method.
 
 
 ![image](https://github.com/user-attachments/assets/110525b2-b635-4db2-9a50-07bee41c906e)
 
 <br>
   
-- **Censys Search:** Censys allows you to search for a single IP using ip 1.1.1.1 or by subnet using ip: 1.1.1.0/24. You can also use their web interface at search.censys.io.
+   - **Censys Search:** Censys allows you to search for a single IP using ip 1.1.1.1 or by subnet using ip: 1.1.1.0/24. You can also use their web interface at search.censys.io.
 
 <br>
 
 ![image](https://github.com/user-attachments/assets/89c3896b-0032-4405-aa83-41080fed6d0b)
 
+<br>
 
 **3\. Analyze the Search Engine Output for Infrastructure Insights** The data returned by Shodan and Censys can provide a detailed view of the attacker's infrastructure.
 
@@ -167,15 +172,17 @@ Here's a step-by-step guide on how an analyst would apply bulk data from a passw
 
 **4\. Refine Searches and Expand Investigation** Based on initial findings, an analyst can refine their searches to uncover more about the attack infrastructure.
 
-- **Search by ASN:** If an IP belongs to a particular ASN, you can search for asn:AS\[number\] in Shodan or autonomous_system.asn:\[number\] in Censys to find **all devices on that ASN**. This can reveal if the attacker is using a network segment heavily populated by compromised devices or VPS.
+   - **Search by ASN:** If an IP belongs to a particular ASN, you can search for asn:AS\[number\] in Shodan or autonomous_system.asn:\[number\] in Censys to find **all devices on that ASN**. This can reveal if the attacker is using a network segment heavily populated by compromised devices or VPS.
   
-- **Combine Filters:** Both search engines allow combining multiple filters. For example, asn:AS14061 product:MySQL in Shodan to find MySQL servers within a specific ASN, or services.service_name: MODBUS and location.country: Germany in Censys to find services in a specific location.
+   - **Combine Filters:** Both search engines allow combining multiple filters. For example, asn:AS14061 product:MySQL in Shodan to find MySQL servers within a specific ASN, or services.service_name: MODBUS and location.country: Germany in Censys to find services in a specific location.
   
-- **Look for Compromised Device Indicators:**
-  - **Censys:** Queries like services.service_name: MIKROTIK_BW and "HACKED" can identify compromised MikroTik Routers.
-  - **Shodan:** Search for screenshot.label:webcam or screenshot.label:ics to find publicly available webcams or industrial control systems. The presence of passwordless Pi-Holes can also be found via Shodan.
+   - **Look for Compromised Device Indicators:**
+     - **Censys:** Queries like services.service_name: MIKROTIK_BW and "HACKED" can identify compromised MikroTik Routers.
+     - **Shodan:** Search for screenshot.label:webcam or screenshot.label:ics to find publicly available webcams or industrial control systems. The presence of passwordless Pi-Holes can also be found via Shodan.
     
 - **Monitor Networks (Shodan Monitor):** For continuous monitoring of your own network or specific IP ranges, **Shodan Monitor** can be used to set up notifications for detected security vulnerabilities, open ports, and notable IPs.
+
+<br>
 
 **5\. Understand Implications for ORB Networks** Many threat actors, particularly those attributed to China, are increasingly using **Operational Relay Box (ORB) networks**. These networks are composed of Virtual Private Server (VPS) hosts and compromised Internet of Things (IoT) devices, creating a decentralized "mesh" network for anonymized communication.
 
@@ -186,6 +193,8 @@ Here's a step-by-step guide on how an analyst would apply bulk data from a passw
 - **Hiding in the Noise:** ORB networks often route "normal" traffic alongside malicious traffic to obscure their activities. Shodan and Censys data can help analysts distinguish between legitimate and suspicious activity by providing context on the services and behaviors observed on an IP.
   
 - **Collateral Damage Risk:** A significant portion of ORB networks consists of compromised residential or commercial IPs. Blocking these IPs identified via Shodan/Censys carries a risk of blocking legitimate users.
+
+<br>
 
 **6\. Integrate Findings into Proactive Defense Strategies** The intelligence gathered from Shodan and Censys can inform broader defense strategies:
 
