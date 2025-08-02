@@ -6,7 +6,12 @@ url: "https://cti-buddy.github.io"
 sass:
   sass_dir: _sass
 
+markdown: kramdown
 
+kramdown:
+  input: GFM  # GitHub-Flavored Markdown (enables `tables`, `task lists`, etc.)
+  syntax_highlighter: rouge
+  
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
