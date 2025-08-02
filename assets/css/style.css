@@ -1063,12 +1063,7 @@ pre code {
   height: 100%;
 }
 
-/* Override global font settings for all post content */
-.cyber-main .single-post .post-content,
-.single-post .post-content,
-article.post .post-content {
-  font-family: 'Inter', sans-serif !important;
-}
+
 
 /* Dropdown filter style */
 .tag-filter {
