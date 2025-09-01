@@ -46,11 +46,11 @@ Here’s how the 339 applications broke down:
     Nearly one in four applications ended without a response. No rejection, no feedback, just silence. This became so common that I started to expect it, but it doesn’t make it any less discouraging.
 - **26 first-round interviews (~7.7%)**  
     About one in every thirteen applications resulted in an initial conversation. From there, the funnel narrowed quickly:
-  - **19 second-rounds**
-  - **7 third-rounds**
-  - **6 fourth-rounds**
-  - **5 fifth-rounds**
-  - **3 sixth-rounds**
+      - **19 second-rounds**
+      - **7 third-rounds**
+      - **6 fourth-rounds**
+      - **5 fifth-rounds**
+      - **3 sixth-rounds**
 - **3 withdrawals**  
     In a few cases I stepped back myself, but I should note this was explicitly after I had accepted the one job offer.
 - **18 rejections**  
