@@ -4,7 +4,7 @@ title: "What Actually Changes Hands When a SOC Case Escalates?"
 date: 2026-09-20
 tagline: "An assignment-only record can't tell you whether the team asked for help or handed over the case"
 image: /IMG/090726.jpg
-tags: [Security Operations, Human Factors, Incident Response]
+tags: [SOC Management, Human Factors, Incident Response]
 ---
 
 Check what your case system actually writes down the next time somebody escalates. If all it captured is a field changing - the assignee moves from one name or group to another, or a tag flips - then you know something moved. You don't know what kind of move it was.
