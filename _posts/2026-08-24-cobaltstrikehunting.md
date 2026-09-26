@@ -3,7 +3,7 @@ layout: post
 title: "What a Cobalt Strike Config Match Actually Buys You"
 date: 2026-08-24
 tagline: "Working a ten-row configuration match into a SOC handover"
-image: /IMG/082426.jpg
+image: /IMG/082426.png
 tags: [Threat Intelligence, Threat Analysis]
 ---
 
