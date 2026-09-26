@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "What Actually Changes Hands When a SOC Case Escalates?"
-date: 2026-09-20
+date: 2026-09-07
 tagline: "An assignment-only record can't tell you whether the team asked for help or handed over the case"
 image: /IMG/090726.jpg
 tags: [SOC Management, Human Factors, Incident Response]
