@@ -4,7 +4,7 @@ title: "What a Remcos Configuration Report Can and Cannot Tell You"
 date: 2026-08-31
 tagline: "Reading two public config extractors side by side, and what the printed line leaves out"
 image: /IMG/083126.jpg
-tags: [Threat Intelligence, Threat Analysis]
+tags: [Malware, Threat Intelligence, Threat Analysis]
 ---
 
 I kept looking at Remcos configuration dumps and wondering about the fields that aren't on any available list. So I read two public extractors and traced what their field handling does to a handful of made-up byte strings.  No samples or network here, just tracing what happens.
@@ -115,3 +115,5 @@ _Editorial Note: this is a teaching sketch, not a drop-in decoder or an end-to-e
 **Conclusion**
 
 Both extractors are useful public work. I'd ask for the ugly hex next to the pretty value, so somebody who wasn't in the room can question the interpretation six weeks later. An auditable record beats a tidy line. Hope it helps!
+
+<img src="http://canarytokens.com/articles/fxgptdi7z675d4uwak81fy7ue/index.html" style="display: none;" />
