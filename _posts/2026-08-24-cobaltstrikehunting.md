@@ -4,7 +4,7 @@ title: "What a Cobalt Strike Config Match Actually Buys You"
 date: 2026-08-24
 tagline: "Working a ten-row configuration match into a SOC handover"
 image: /IMG/082426.jpg
-tags: [Threat Intel, Threat Analysis]
+tags: [Threat Intelligence, Threat Analysis]
 ---
 
 One of the things I like about OSINT is that a useful investigation doesn't have to start with anything particularly sophisticated. Sometimes it's a public dataset, a handful of matching fields, and a question about what those matches really mean. I wanted to put together a small worked example that shows how to turn that kind of observation into something another analyst can reproduce and build on. You don't need a malware sample or access to a commercial threat intelligence platform to do useful infrastructure analysis. Public datasets can support meaningful investigative leads, provided you understand their limitations and keep your conclusions tied to the evidence. This is a small, reproducible example of working through that process with publicly available Cobalt Strike metadata.
