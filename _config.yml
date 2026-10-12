@@ -15,6 +15,7 @@ kramdown:
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
+  - jekyll-sitemap
 
 # Add this section to enforce layouts globally
 defaults:
