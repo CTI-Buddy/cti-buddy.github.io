@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "East, Fast, Cheap Deception in the Cloud"
+title: "Easy, Fast, Cheap Deception in the Cloud"
 date: 2025-06-22
 tagline: "Leveraging External IdP for Easy Honeynets"
 image: /IMG/062225.jpg
