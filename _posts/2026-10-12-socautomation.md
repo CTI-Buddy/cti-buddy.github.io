@@ -3,7 +3,7 @@ layout: post
 title: "When Is an Automated SOC Response Ready to Run?"
 date: 2026-10-12
 tagline: "A detection you believe tells you something is wrong. It doesn't tell you what you're allowed to do about it."
-image: /IMG/101226
+image: /IMG/101226.png
 tags: [Security Operations, Incident Response, AI]
 ---
 
