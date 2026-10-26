@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "What Does Cyber Defense Need From an Intelligence Shop?"
-date: 2026-10-08
+date: 2026-10-26
 tagline: "On borrowed structures, mismatched questions, and the difference between an accurate answer and a useful one"
 image: /IMG/102626.jpg
 tags: [Threat Intel, Security Strategy, Human Factors]
