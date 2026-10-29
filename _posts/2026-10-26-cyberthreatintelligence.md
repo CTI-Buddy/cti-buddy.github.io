@@ -29,7 +29,7 @@ Before arguing about whether intelligence is "actionable," I want to separate fo
 - **Needed** is the uncertainty or understanding that bears on a mission, obligation or decision the organization has. A need can precede agreement. Authorized leadership can set priorities without unanimity; negotiation helps expose incompatible expectations and make the assignment clear.
 - **Usable** is what that consumer can interpret and employ with the time, evidence, authority, systems and capacity they have. That includes deciding, preparing, revising their picture of the risk, or concluding that nothing needs to change. The same paragraph can be usable for a legal adviser and inert for a detection engineer without either being wrong.
 <br>
-
+<br>
 
 By traditional intelligence I mean national and military institutions - their missions, consumer relationships, collection arrangements, professional formation and production practices. I don't mean a toolbox of analytical techniques. Techniques can travel, but somebody has to select the ones that fit and adapt them. It is the institutional assumptions riding along unexamined that concern me.
 
@@ -66,6 +66,8 @@ Four things I'd want clear when discussing a requirement follow. They aren't a g
 - When the answer has to exist, and when it stops being useful.
 - What limits are acceptable. If the honest answer will be partial, say so while there's still time to decide whether partial is worth paying for.
 <br>
+<br>
+
 
 A request isn't automatically a need. A SOC can ask for the wrong thing, confidently, and simply filling orders is no substitute for understanding the problem. A producer can also identify a need the consumer doesn't accept. Priority disputes belong with whoever has the assigned authority to settle them, which can include the intelligence function itself. Where CTI's delegated authority ends, improving the requirements document won't substitute for a leadership decision.
 
@@ -104,6 +106,7 @@ Here are four relationships an intelligence shop can have with the evidence it u
 - **Requesting support from somebody else.** You can negotiate priority without having authority to set it. That 1994 manual distinguishes ["task organic assets, request support from higher headquarters, and recommend tasking to subordinate echelons"](https://irp.fas.org/doddir/army/fm34-2/Ch3.htm). The verbs reflect different authority relationships.
 - **Buying published coverage.** A supplier sells material it collects. FIRST describes [incorporating "data from underground forums provided through threat intelligence partners"](https://www.first.org/global/sigs/cti/cti-program/stage2). A subscription without bespoke tasking doesn't itself give you the right to direct new collection. It doesn't prevent asking for clarification or existing material you haven't seen.
 - **Obtaining authorized access to local records.** "We have that" and "we can lawfully get at that, going back far enough" are different statements. This relationship concerns authority and retention as well as the existence of a source.
+<br>
 <br>
 
 
@@ -167,7 +170,8 @@ The engineering path helps distinguish three failures that can look similar from
   - **The product did not address the need.** The requirement may have been unclear, or clear and badly executed. Those call for different repairs.
   - **The product addressed the need and the organization lacked capacity to use it.** This may require funding the work or accepting the exposure. If a knowable capacity constraint was missed during scoping, CTI can share responsibility for the mismatch.
   - **The product addressed the need and the data required to act does not exist.** Better writing won't create it. A missed data dependency can also be a scoping failure, not solely a problem for the engineering team.
-
+<br>
+<br>
 
 These aren't exclusive assignments of blame. Collapsing them into "CTI is not actionable" risks improving report formatting to solve a logging-retention problem.
 
@@ -214,6 +218,7 @@ I would keep three responsibilities distinct:
 <br>
 <br>
 
+
 A CTI team that says "here are three ways you could handle the partner renewal, here is what each buys you, here is what we cannot tell you" has not compromised its independence by the act of listing options. The format is not the safeguard - three options can be presented dishonestly, with the preferred one dressed up and the other two built to lose. A CTI team that says "the renewal is fine, nothing to worry about" because that is what the business wanted to hear has compromised something. The difference is whether the evidence would read the same way if the business wanted the opposite answer.
 
 A dissatisfied consumer doesn't establish that the intelligence was bad. An uncomfortable finding doesn't establish that the analysis was politicized. Both inferences are lazy; ask what evidence supports them.
@@ -258,6 +263,8 @@ I'd start with questions, not another summary metric. Use product, timing and re
 - Where the consumer disagreed, was that about evidence, relevance or the conclusion, and was it recorded?
 - What follow-on work did use require, and did anyone own it?
 <br>
+<br>
+
 
 That review consumes effort. The IC's public explanation describes evaluating products [using "the IC Analytic Standards as the core criteria"](https://www.intelligence.gov/mission/our-values/objectivity), but an enterprise CTI team cannot assume the same review resources. I would keep a minimum version and resist replacing report counts with immediate-action counts. That can score a useful strategic assessment or legal exposure statement at zero for producing no immediate change.
 
@@ -277,6 +284,8 @@ I would start with four questions about an existing arrangement, not treat the a
 - What would a satisfactory answer let somebody do, decide or understand differently, given today's authority, capacity and data?
 - Does the complaint concern a misfit, a legitimate mission I don't personally value, a question the available evidence cannot settle, unfunded work, or some combination?
 <br>
+<br>
+
 
 
 Those aren't the only possibilities, and several can be in play. A misfit calls for examining and changing the arrangement. A legitimate mission you don't value calls for a conversation with whoever does, and possibly the humility to lose that argument. An unresolved question needs its missing evidence made explicit and reconsideration when evidence or priorities change. Unfunded implementation needs a budget decision; CTI can still contribute by scoping and explaining the work required. Rewriting a report won't create the resources, but neither does a resource problem absolve intelligence of its part in defining the need.
