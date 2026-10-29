@@ -33,12 +33,12 @@ The general idea isn't new. NIST's glossary, drawing on SP 800-128, defines a [b
 
 The portfolio is everything the organization actually supports: the core - the baseline's capabilities and the implementations serving them - plus the satellites. These are the working definitions I'll hold for the rest of the post:
 
-- **Capability:** a stable, bounded detection purpose with declared applicability, the observable behavior it covers, the evidence it requires and its meaningful limits.
-- **Baseline:** a versioned snapshot identifying selected capability definitions and their intended reference condition.
-- **Core:** the capabilities included in a declared baseline, and the implementations serving them.
-- **Satellite:** a supported detection purpose retained outside that baseline's selected scope or organizing criteria.
-- **Implementation:** concrete analytic logic, together with the mappings, configuration and deployment context needed to interpret what it does.
-- **Assurance:** evidence supporting a bounded statement about a particular implementation, in a particular scope, at a particular time.
+  - **Capability:** a stable, bounded detection purpose with declared applicability, the observable behavior it covers, the evidence it requires and its meaningful limits.
+  - **Baseline:** a versioned snapshot identifying selected capability definitions and their intended reference condition.
+  - **Core:** the capabilities included in a declared baseline, and the implementations serving them.
+  - **Satellite:** a supported detection purpose retained outside that baseline's selected scope or organizing criteria.
+  - **Implementation:** concrete analytic logic, together with the mappings, configuration and deployment context needed to interpret what it does.
+  - **Assurance:** evidence supporting a bounded statement about a particular implementation, in a particular scope, at a particular time.
 
 <br>
 
@@ -90,10 +90,10 @@ Collapse those into one record and you lose the ability to answer basic question
 
 The arrangement I'm proposing keeps those records apart while still connecting them. Essentially, we are talking about a proposed detection-portfolio model that separates what an organization intends to detect from how it implements and evidences that intent, so detection additions, fixes, and scope changes can be evaluated deliberately rather than inferred from the inventory. This isn't a standard, a Sigma extension or a scoring scheme, and I'm not claiming anyone has measured it making a detection program better. That said, the mechanics are simple:
 
-- The baseline version and each capability-definition revision are recorded independently of analytic revisions, deployment records and assurance evidence.
-- Analytic revisions are immutable. A change produces a new revision; it doesn't edit the old one.
-- Every comparison names exactly which baseline version, capability revision, analytic revision and evidence it used. No aliases.
-- Assurance evidence carries its own date, scope and limitations, and stays attached to the implementation and interval it describes.
+  - The baseline version and each capability-definition revision are recorded independently of analytic revisions, deployment records and assurance evidence.
+  - Analytic revisions are immutable. A change produces a new revision; it doesn't edit the old one.
+  - Every comparison names exactly which baseline version, capability revision, analytic revision and evidence it used. No aliases.
+  - Assurance evidence carries its own date, scope and limitations, and stays attached to the implementation and interval it describes.
 
 Here's what that looks like with a core capability and a satellite side by side.
 
@@ -162,11 +162,11 @@ Public guidance grounds the suspicion. Among the [mutable elements in DET0455](h
 
 It also has to be clear about what a match means. ATT&CK's [PowerShell technique page](https://attack.mitre.org/techniques/T1059/001/) notes that PowerShell "could be in use for many legitimate purposes and administrative functions," that commands and scripts "can also be executed without directly invoking the `powershell.exe` binary" through the `System.Management.Automation` assembly, and that PowerShell can be used to download and run executables "from disk or in memory without touching disk." It isn't Windows-only, either. So an Office application directly creating `powershell.exe` is a relationship that deserves an analyst's look. It isn't proof that the script, the document or the user is malicious, and a capability that sees only that relationship can't claim to cover PowerShell abuse in general. Revision 1 says so in its explicit exclusions:
 
-- PowerShell hosted inside another process through `System.Management.Automation`
-- Linux and macOS
-- parents other than WinWord and Excel, intermediary process chains and renamed executables
-- any claim to cover all of T1059.001 or everything AN1252 describes
-- any claim that a script ran successfully, did harm or lacked authorization
+  - PowerShell hosted inside another process through `System.Management.Automation`
+  - Linux and macOS
+  - parents other than WinWord and Excel, intermediary process chains and renamed executables
+  - any claim to cover all of T1059.001 or everything AN1252 describes
+  - any claim that a script ran successfully, did harm or lacked authorization
 
 The evidence comes from process-creation events. Microsoft's archived Windows 10 documentation for [Event 4688](https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4688) describes the fields: the new process name, the "full path and the name of the executable for the new process"; the creator process ID; a creator process name (`ParentProcessName` in the event XML) added in event version 2; and a process command line, present in versions 1 and 2, which the page says is empty by default unless the "Include command line in process creation events" policy is enabled. That documents a schema and its configuration conditions. It doesn't guarantee that a given fleet, collector or parser produces those fields, and it isn't a statement about every current Windows release. So C-PS01 stipulates them: version 2 events, collected and parsed correctly, with the command line enabled. Its required observations from the event are the source computer and time, the new process and creator process names, account context and the child's command line, which reviewers need for context and which the exception check uses for one specific fact. Excusing a launch also takes two things the event can't supply: a current register of approved workflows, and an execution-context record for that launch.
 
@@ -222,9 +222,9 @@ Same organization, different detection. One of its applications pays suppliers. 
 
 The detection, S-PAY01, identifies release of a supplier payment against a beneficiary revision that lacks the independent approval the policy requires. Here's the positive case, with record completeness stipulated:
 
-1. An independent approver approves beneficiary revision R5 for payment P.
-2. The beneficiary details change, creating revision R6. The approval stays explicitly bound to R5.
-3. A release record shows payment P released against R6. The complete, authoritative record contains no qualifying approval of R6 and no permitted override.
+  1. An independent approver approves beneficiary revision R5 for payment P.
+  2. The beneficiary details change, creating revision R6. The approval stays explicitly bound to R5.
+  3. A release record shows payment P released against R6. The complete, authoritative record contains no qualifying approval of R6 and no permitted override.
 
 Within the fictional policy and those completeness assumptions, the release violates the declared requirement, and the organization treats that as an urgent payment-diversion exposure. That's what makes S-PAY01 critical: the consequence, and the response it needs. It's not what the detection establishes about anyone's intent. The records don't show who meant to do what, whether an account was compromised, whether money actually moved or whether anything was lost. The detection's claim is narrower and still serious: a release happened that the policy says shouldn't have, and someone needs to look now.
 
@@ -238,10 +238,10 @@ This is where the definition of membership does real work. Core and satellite di
 
 S-PAY01 can stay a satellite for as long as the payment workflow exists, and there's nothing unfinished about that. What it needs is the support anything in core would get:
 
-- **Ownership:** an application detection owner maintains the semantics and the implementation; the SOC owns the agreed alert-handling path.
-- **Review triggers:** changes to the application schema, the approval policy, the release paths or the business purpose.
-- **Testing:** scoped positive, legitimate reapproval, authorized override and incomplete-record checks for any implementation.
-- **Retirement basis:** loss of the detection purpose, a replacement backed by an adequate comparison, or an explicit risk decision. Never failure to enter core.
+  - **Ownership:** an application detection owner maintains the semantics and the implementation; the SOC owns the agreed alert-handling path.
+  - **Review triggers:** changes to the application schema, the approval policy, the release paths or the business purpose.
+  - **Testing:** scoped positive, legitimate reapproval, authorized override and incomplete-record checks for any implementation.
+  - **Retirement basis:** loss of the detection purpose, a replacement backed by an adequate comparison, or an explicit risk decision. Never failure to enter core.
 
 None of that is novel. [ADS](https://github.com/palantir/alerting-detection-strategy-framework/blob/master/ADS-Framework.md) already asks every strategy for a goal, blind spots, validation and response steps. The point is that a satellite carries those obligations as fully as anything in core, instead of getting a lighter standard because it sits outside the baseline.
 
@@ -282,11 +282,11 @@ _Illustrative classifications for the fictional C-PS01 capability._
 
 For any of this to be decidable later, each comparison has to record what it compared. Not a heavyweight form, just enough that someone reading it next year can reconstruct the claim:
 
-- **Reference:** baseline B1 and capability C-PS01 revision 1.
-- **Implementation:** analytic revision A1 or A2, with an immutable artifact reference in a real system.
-- **Deployment:** the deployment revision and the declared population.
-- **Dependencies:** the parser, field-mapping and approved-workflow register revisions in effect, and the source and revision of any execution-context records an exception relied on.
-- **Evidence:** the assurance record's identifier, observation interval, assessment time, scope and limitations.
+  - **Reference:** baseline B1 and capability C-PS01 revision 1.
+  - **Implementation:** analytic revision A1 or A2, with an immutable artifact reference in a real system.
+  - **Deployment:** the deployment revision and the declared population.
+  - **Dependencies:** the parser, field-mapping and approved-workflow register revisions in effect, and the source and revision of any execution-context records an exception relied on.
+  - **Evidence:** the assurance record's identifier, observation interval, assessment time, scope and limitations.
 
 <br>
 
