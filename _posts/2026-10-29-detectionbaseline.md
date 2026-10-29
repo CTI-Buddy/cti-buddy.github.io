@@ -32,7 +32,7 @@ A baseline answers a different question: what did we commit to detecting, for wh
 The general idea isn't new. NIST's glossary, drawing on SP 800-128, defines a [baseline configuration](https://csrc.nist.gov/glossary/term/baseline_configuration) as a set of specifications "formally reviewed and agreed on at a given point in time," one that "can be changed only through change control procedures" and is "used as a basis for future builds, releases, and/or changes." That definition is about systems and configuration items, and I'm not suggesting NIST says anything about detection portfolios. I'm borrowing its shape: an agreed reference, fixed per version, that reality gets compared against.
 
 The portfolio is everything the organization actually supports: the core - the baseline's capabilities and the implementations serving them - plus the satellites. These are the working definitions I'll hold for the rest of the post:
-
+<br>
   - **Capability:** a stable, bounded detection purpose with declared applicability, the observable behavior it covers, the evidence it requires and its meaningful limits.
   - **Baseline:** a versioned snapshot identifying selected capability definitions and their intended reference condition.
   - **Core:** the capabilities included in a declared baseline, and the implementations serving them.
@@ -89,7 +89,7 @@ Assurance is evidence about an implementation - a test result, a review of produ
 Collapse those into one record and you lose the ability to answer basic questions. A rule's last-modification date, which is what Sigma's [`modified` field](https://sigmahq.io/sigma-specification/specification/sigma-rules-specification.html) records, tells you the rule changed; it can't tell you whether the promise did. An alias like "current" or "latest" is convenient for deployment and corrosive for history, because any comparison made against "current" silently changes meaning the next time someone edits it. And a test that passed in March is direct evidence about the parser that was running in March; how much it says about June depends on what changed in between.
 
 The arrangement I'm proposing keeps those records apart while still connecting them. Essentially, we are talking about a proposed detection-portfolio model that separates what an organization intends to detect from how it implements and evidences that intent, so detection additions, fixes, and scope changes can be evaluated deliberately rather than inferred from the inventory. This isn't a standard, a Sigma extension or a scoring scheme, and I'm not claiming anyone has measured it making a detection program better. That said, the mechanics are simple:
-
+<br>
   - The baseline version and each capability-definition revision are recorded independently of analytic revisions, deployment records and assurance evidence.
   - Analytic revisions are immutable. A change produces a new revision; it doesn't edit the old one.
   - Every comparison names exactly which baseline version, capability revision, analytic revision and evidence it used. No aliases.
@@ -161,7 +161,7 @@ One of B1's capabilities is C-PS01, revision 1. In plain language: identify and 
 Public guidance grounds the suspicion. Among the [mutable elements in DET0455](https://attack.mitre.org/detectionstrategies/DET0455/) is a parent-process filter "based on abnormal parents like Excel, WinWord, or mshta spawning PowerShell." But C-PS01 is deliberately much smaller than that strategy. The strategy's analytic, AN1252, "detects behavioral chains where PowerShell is launched with encoded commands, unusual parent processes, or suspicious modules loaded," "supports detection of both direct (powershell.exe) and indirect (.NET automation) invocations," and [lists Sysmon process-creation and module-load events plus PowerShell's own event logs](https://attack.mitre.org/detectionstrategies/DET0455/) as its sources. C-PS01 promises one relationship from one kind of record, and it uses Windows Security process-creation events, which aren't among the sources AN1252 lists. That's fine for an organization's own capability. The public strategy is a source of ideas, not a specification C-PS01 claims to implement, and the reference should say plainly how much smaller it is.
 
 It also has to be clear about what a match means. ATT&CK's [PowerShell technique page](https://attack.mitre.org/techniques/T1059/001/) notes that PowerShell "could be in use for many legitimate purposes and administrative functions," that commands and scripts "can also be executed without directly invoking the `powershell.exe` binary" through the `System.Management.Automation` assembly, and that PowerShell can be used to download and run executables "from disk or in memory without touching disk." It isn't Windows-only, either. So an Office application directly creating `powershell.exe` is a relationship that deserves an analyst's look. It isn't proof that the script, the document or the user is malicious, and a capability that sees only that relationship can't claim to cover PowerShell abuse in general. Revision 1 says so in its explicit exclusions:
-
+<br>
   - PowerShell hosted inside another process through `System.Management.Automation`
   - Linux and macOS
   - parents other than WinWord and Excel, intermediary process chains and renamed executables
@@ -221,7 +221,7 @@ It doesn't justify deploying A2 on the strength of a table in a blog post. It do
 Same organization, different detection. One of its applications pays suppliers. Each supplier has beneficiary details, and every change to them creates a new beneficiary revision. The application's declared policy is that a payment may be released only against a beneficiary revision an independent approver has approved, with the approval bound to that exact revision.
 
 The detection, S-PAY01, identifies release of a supplier payment against a beneficiary revision that lacks the independent approval the policy requires. Here's the positive case, with record completeness stipulated:
-
+<br>
   1. An independent approver approves beneficiary revision R5 for payment P.
   2. The beneficiary details change, creating revision R6. The approval stays explicitly bound to R5.
   3. A release record shows payment P released against R6. The complete, authoritative record contains no qualifying approval of R6 and no permitted override.
@@ -237,7 +237,7 @@ Not because it matters less, and not because it's immature: by stipulation it's 
 This is where the definition of membership does real work. Core and satellite differ in scope coherence - whether a detection shares the reference's organizing criteria and evidence semantics - not in importance, and not in what infrastructure they happen to share. Another organization could reasonably build a baseline for its payment platform in which S-PAY01's invariant is core. That would be a different reference with different organizing criteria, and just as legitimate. What I'm arguing against is the idea that application-specific detections are second-tier by nature, or that a detection outside the current baseline is a baseline candidate that hasn't made it yet.
 
 S-PAY01 can stay a satellite for as long as the payment workflow exists, and there's nothing unfinished about that. What it needs is the support anything in core would get:
-
+<br>
   - **Ownership:** an application detection owner maintains the semantics and the implementation; the SOC owns the agreed alert-handling path.
   - **Review triggers:** changes to the application schema, the approval policy, the release paths or the business purpose.
   - **Testing:** scoped positive, legitimate reapproval, authorized override and incomplete-record checks for any implementation.
@@ -281,7 +281,7 @@ _Illustrative classifications for the fictional C-PS01 capability._
 <br>
 
 For any of this to be decidable later, each comparison has to record what it compared. Not a heavyweight form, just enough that someone reading it next year can reconstruct the claim:
-
+<br>
   - **Reference:** baseline B1 and capability C-PS01 revision 1.
   - **Implementation:** analytic revision A1 or A2, with an immutable artifact reference in a real system.
   - **Deployment:** the deployment revision and the declared population.
