@@ -39,8 +39,8 @@ The portfolio is everything the organization actually supports: the core - the b
   - **Satellite:** a supported detection purpose retained outside that baseline's selected scope or organizing criteria.
   - **Implementation:** concrete analytic logic, together with the mappings, configuration and deployment context needed to interpret what it does.
   - **Assurance:** evidence supporting a bounded statement about a particular implementation, in a particular scope, at a particular time.
-
 <br>
+
 
 <img width="1448" height="1086" alt="Diagram of the detection portfolio, divided into core and satellite detections. The core contains capabilities selected for the detection baseline, while satellites are supported detections outside its selected scope. Both are organized around capability, implementation, and assurance records. A bottom panel shows the three linked records: capability reference, implementation record, and evidence record." src="https://github.com/user-attachments/assets/24a9e6c7-66d8-4c96-ab43-8ad38ce14675" />
 
@@ -94,6 +94,7 @@ The arrangement I'm proposing keeps those records apart while still connecting t
   - Analytic revisions are immutable. A change produces a new revision; it doesn't edit the old one.
   - Every comparison names exactly which baseline version, capability revision, analytic revision and evidence it used. No aliases.
   - Assurance evidence carries its own date, scope and limitations, and stays attached to the implementation and interval it describes.
+<br>
 <br>
 Here's what that looks like with a core capability and a satellite side by side.
 
@@ -168,6 +169,8 @@ It also has to be clear about what a match means. ATT&CK's [PowerShell technique
   - any claim to cover all of T1059.001 or everything AN1252 describes
   - any claim that a script ran successfully, did harm or lacked authorization
 <br>
+<br>
+
 The evidence comes from process-creation events. Microsoft's archived Windows 10 documentation for [Event 4688](https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4688) describes the fields: the new process name, the "full path and the name of the executable for the new process"; the creator process ID; a creator process name (`ParentProcessName` in the event XML) added in event version 2; and a process command line, present in versions 1 and 2, which the page says is empty by default unless the "Include command line in process creation events" policy is enabled. That documents a schema and its configuration conditions. It doesn't guarantee that a given fleet, collector or parser produces those fields, and it isn't a statement about every current Windows release. So C-PS01 stipulates them: version 2 events, collected and parsed correctly, with the command line enabled. Its required observations from the event are the source computer and time, the new process and creator process names, account context and the child's command line, which reviewers need for context and which the exception check uses for one specific fact. Excusing a launch also takes two things the event can't supply: a current register of approved workflows, and an execution-context record for that launch.
 
 Both deserve a careful definition, because a loosely defined exception can quietly swallow the behavior a capability exists to catch. In C-PS01, an approved exception is a register entry for one specific automation. It names the host population the automation runs on, the account it runs as, its invocation - the exact arguments it passes to PowerShell - the known revision of the script it runs and the operation it performs, and it has to be current when the event occurs. A launch is excused only when evidence about that particular launch establishes every one of those facts, and no single record does. The event places the launch on a host and under an account. The command line shows what PowerShell was asked to run, such as a script path or an encoded command, and so whether the launch asked for the registered invocation with nothing added. That's the one part of the exception the command line carries. It can't show which revision of a script actually ran or what the run did: a path tells you where a file sat, not what it contained at that moment, and arguments describe a request, not an operation.
@@ -226,6 +229,8 @@ The detection, S-PAY01, identifies release of a supplier payment against a benef
   2. The beneficiary details change, creating revision R6. The approval stays explicitly bound to R5.
   3. A release record shows payment P released against R6. The complete, authoritative record contains no qualifying approval of R6 and no permitted override.
 <br>
+<br>
+
 Within the fictional policy and those completeness assumptions, the release violates the declared requirement, and the organization treats that as an urgent payment-diversion exposure. That's what makes S-PAY01 critical: the consequence, and the response it needs. It's not what the detection establishes about anyone's intent. The records don't show who meant to do what, whether an account was compromised, whether money actually moved or whether anything was lost. The detection's claim is narrower and still serious: a release happened that the policy says shouldn't have, and someone needs to look now.
 
 Two countervariants keep the claim bounded. If R6 receives the required independent approval before release, the violation condition is absent, assuming the other declared facts hold. And if the approval records or the revision binding are incomplete, whether this release violated the requirement is unresolved. The collection defect may need urgent attention of its own, but missing evidence doesn't become proven misconduct, just as C-PS01's missing parent didn't settle anything about that launch in either direction.
@@ -243,6 +248,8 @@ S-PAY01 can stay a satellite for as long as the payment workflow exists, and the
   - **Testing:** scoped positive, legitimate reapproval, authorized override and incomplete-record checks for any implementation.
   - **Retirement basis:** loss of the detection purpose, a replacement backed by an adequate comparison, or an explicit risk decision. Never failure to enter core.
 <br>
+<br>
+
 None of that is novel. [ADS](https://github.com/palantir/alerting-detection-strategy-framework/blob/master/ADS-Framework.md) already asks every strategy for a goal, blind spots, validation and response steps. The point is that a satellite carries those obligations as fully as anything in core, instead of getting a lighter standard because it sits outside the baseline.
 
 Cross-labels still connect it to the rest of the portfolio. Tag it with the application, with integrity and payment-process categories and with the response playbook that applies. Someone searching for that application, or for payments, should find it. Those labels associate; they don't merge.
