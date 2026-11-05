@@ -80,10 +80,6 @@ Finally, `readOnly` is `true` on this event, and it is worth saying what that do
 
 <br>
 
-<img width="1448" height="1086" alt="Forensic Cloud Credential Timeline" src="https://github.com/user-attachments/assets/efdb3ff1-6f07-4f3c-9877-8a55924a8f19" />
-
-<br>
-
 **Join the session to downstream requests, and know when you cannot**
 
 The strongest available link between issuance and use is the access key. In a CloudTrail `userIdentity`, `accessKeyId` is [the access key ID that was used to sign the request, and for temporary credentials it is the access key ID of the temporary credentials](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-user-identity.html). So `responseElements.credentials.accessKeyId` from the issuance event should appear as `userIdentity.accessKeyId` on requests made with that session.
@@ -339,7 +335,7 @@ The matching itself is ordinary string comparison, not a regex engine. `StringEq
 
 <br>
 
-<img width="877" height="389" alt="GitHub OIDC Subject Matching" src="https://github.com/user-attachments/assets/40fe9b6b-e45c-4e58-bea0-0749b1d3680d" />
+<img width="877" height="389" alt="GitHub OIDC Subject Matching" src="https://github.com/user-attachments/assets/04c93d5b-e563-442c-9661-b4995b900d05" />
 
 <br>
 
