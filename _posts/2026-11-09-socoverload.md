@@ -27,10 +27,12 @@ What's scarce isn't attention in some general sense. It's *eligible* analyst-min
 
 The second thing worth separating is the word "due," because at least four different things render identically on a ticket and behave nothing alike under pressure:
 
-- **A priority label.** P1 over P3. In this fixture it's a preference ordering: which thing you'd rather do first, all else equal, and it is not a time. If policy ties each tier to a binding clock, the label carries that commitment too. Find out which kind you have before you argue from it.
-- **A service commitment with a clock attached.** "First substantive action within fifteen minutes." Somebody promised this to somebody, and changing it takes whoever actually holds that authority. Sometimes that's an internal service owner acting alone; sometimes it needs the agreement of the party the promise was made to, and some promises aren't anybody's to quietly move. In this model that authority sits above the shift.
-- **A physical expiry.** The supplementary log source rolls off in twenty-five minutes. Retention and preservation arrangements can sometimes be changed before a source ages out, by the people who administer it - but not here. In this window the expiry is a fixed input and nobody in the fixture can move it.
-- **A declared non-waivable obligation.** This one I've defined into the model: a requirement the lead cannot set aside whatever the queue looks like. I'm not telling you which real-world legal or regulatory duties behave this way, and you shouldn't take one from me. I'm stipulating one so the schedule has a hard edge in it.
+  - **A priority label.** P1 over P3. In this fixture it's a preference ordering: which thing you'd rather do first, all else equal, and it is not a time. If policy ties each tier to a binding clock, the label carries that commitment too. Find out which kind you have before you argue from it.
+  - **A service commitment with a clock attached.** "First substantive action within fifteen minutes." Somebody promised this to somebody, and changing it takes whoever actually holds that authority. Sometimes that's an internal service owner acting alone; sometimes it needs the agreement of the party the promise was made to, and some promises aren't anybody's to quietly move. In this model that authority sits above the shift.
+  - **A physical expiry.** The supplementary log source rolls off in twenty-five minutes. Retention and preservation arrangements can sometimes be changed before a source ages out, by the people who administer it - but not here. In this window the expiry is a fixed input and nobody in the fixture can move it.
+  - **A declared non-waivable obligation.** This one I've defined into the model: a requirement the lead cannot set aside whatever the queue looks like. I'm not telling you which real-world legal or regulatory duties behave this way, and you shouldn't take one from me. I'm stipulating one so the schedule has a hard edge in it.
+
+<br>
 
 The useful question isn't which of the four outranks which - it's what each requires, who can change it, and which constraints are fixed. A priority label alone doesn't answer that without the policy behind it. One of the SOC managers interviewed by Kokulu et al. described their version of the second category as a ladder - ["In order to mitigate a P0 we have 30 minutes, P1 60 minutes, P2 120 minutes, P3 24 hours, P4 48 hours"](https://yancomm.net/papers/2019%20-%20CCS%20-%20Matched%20and%20Mismatched%20SOCs.html) - and reported hitting it 87 percent of the time while being unhappy about it. That's one participant's self-reported account from an eighteen-person interview study across six industry sectors, not a measured service level and not a policy recommendation; the paper itself is careful that its results [may not generalize to all SOCs](https://yancomm.net/papers/2019%20-%20CCS%20-%20Matched%20and%20Mismatched%20SOCs.html). I'm citing it because it shows the shape - a priority label fused to a clock - not because it establishes the numbers.
 
@@ -99,6 +101,8 @@ At minute 0 Alex is mid-unit on I and two qualified burst cases land, B1 to Alex
 
 Alex has an actual decision. Option one: stop I now, pay the two-minute minimum state capture, and start B1. Option two: finish I's ten-minute checkpoint first, then start B1.
 
+<br>
+
 Option one, minute by minute:
 
 | Minutes | Alex |
@@ -114,6 +118,8 @@ Option one, minute by minute:
 | 61-88 | I analysis |
 | 88-90 | I status update |
 
+<br>
+
 Option two:
 
 | Minutes | Alex |
@@ -127,6 +133,8 @@ Option two:
 | 52-58 | re-enter the interrupted I unit |
 | 58-88 | I analysis |
 | 88-90 | I status update |
+
+<br>
 
 Both fill exactly ninety minutes with no idle time. Both satisfy every declared in-window requirement: B1's first action, B1's package, O's preservation, B2's first action and package, U's first action and verified containment. Nothing is late in either.
 
@@ -151,6 +159,8 @@ So what actually differs?
 | Total occupancy | 180 | 180 |
 | Ready case-minutes left across all cases at 90 | 48 | 42 |
 | Blocked minutes left at 90 | 30 | 30 |
+
+<br>
 
 That's the whole trade. Eight minutes earlier on B1, against six more minutes of real progress on I. O, B2, U and N are untouched, intake is untouched, and both analysts are busy for all ninety minutes either way - but equal occupancy is not equal case work. The checkpoint option converts six minutes of pause and re-entry into six minutes of actual case work, which is why loaded case time comes out at 143 rather than 137 against the same 180 minutes of occupancy. Note too that the 18 and 12 include the two-minute status update at 88, which is scheduled reporting rather than an interruption cost; pause and re-entry on their own are 16 and 10.
 
@@ -186,10 +196,12 @@ The pause costs are small and they're doing a specific job. Two minutes captures
 
 What those minutes buy is retained state for an obligation that still exists. They don't settle any of these separate questions:
 
-- **A pause is not closure.** I is in progress at 90 in both options, with its related activity still unresolved. The containment that predates the window addressed one known account-access path. It doesn't make further delay harmless, and it doesn't tell you the case is safe to leave - the unexamined related activity is precisely the part nobody can characterize yet.
-- **A pause is not a transfer.** Nobody else became eligible. Alex still owns it.
-- **A pause is not a priority change.** N keeps the higher ordinary priority it arrived with even while it sits behind O, because the reason it waits is an authorized window, not a demotion.
-- **A pause is not authorization.** FIRST's glossary borrows a project-management definition of risk acceptance: a strategy where you [acknowledge the risk and take no action unless it occurs](https://www.first.org/standards/frameworks/csirts/csirt_services_framework_v2.1). Read that for what it is - one glossary's borrowed wording, not a taxonomy that makes deferral and acceptance mutually exclusive. They aren't. Committing to act later and accepting whatever exposure accumulates while you wait are two separate decisions, and the exposure includes activity already underway. Sequencing is the first decision. The second needs somebody with the standing to accept it, and a pause doesn't confer that standing any more than a tidy pause note confers safety.
+  - **A pause is not closure.** I is in progress at 90 in both options, with its related activity still unresolved. The containment that predates the window addressed one known account-access path. It doesn't make further delay harmless, and it doesn't tell you the case is safe to leave - the unexamined related activity is precisely the part nobody can characterize yet.
+  - **A pause is not a transfer.** Nobody else became eligible. Alex still owns it.
+  - **A pause is not a priority change.** N keeps the higher ordinary priority it arrived with even while it sits behind O, because the reason it waits is an authorized window, not a demotion.
+  - **A pause is not authorization.** FIRST's glossary borrows a project-management definition of risk acceptance: a strategy where you [acknowledge the risk and take no action unless it occurs](https://www.first.org/standards/frameworks/csirts/csirt_services_framework_v2.1). Read that for what it is - one glossary's borrowed wording, not a taxonomy that makes deferral and acceptance mutually exclusive. They aren't. Committing to act later and accepting whatever exposure accumulates while you wait are two separate decisions, and the exposure includes activity already underway. Sequencing is the first decision. The second needs somebody with the standing to accept it, and a pause doesn't confer that standing any more than a tidy pause note confers safety.
+
+<br>
 
 And the distinction I'd push hardest on: a record does not create capacity. Writing a beautiful pause note with retained state, next step and risk commentary doesn't reserve a minute to resume the case. It makes the obligation legible to other people, which is the job the SRE chapter describes when it says a handoff [maintains shared state between ticket handlers](https://sre.google/sre-book/dealing-with-interrupts/). But the minutes to resume still have to come from somewhere, and the queue does not notice that you documented it.
 
@@ -201,12 +213,16 @@ An unwritten plan can still be a plan. If the lead knows the next step, the step
 
 So let's make the lead pay for one. Here's the conditional continuation on Blair's side after minute 90 - conditional because it depends on the same people staying available, the estimates holding, the reported precautions remaining applicable, and no new non-deferrable demand arriving.
 
+<br>
+
 | Minutes | Blair | Against |
 | --- | --- | --- |
 | 90-100 | O's final decision unit | O's remaining handling owed at 105 |
 | 100-110 | N's first unit, first action at 102 | N's first action owed at 105 |
 | 110-115 | intake | check spacing stays within 25 minutes |
 | 115-130 | N's finishing unit | N's package owed at 130 |
+
+<br>
 
 Everything lands. O finishes five minutes early, N starts three minutes early, N's package closes exactly on its deadline.
 
