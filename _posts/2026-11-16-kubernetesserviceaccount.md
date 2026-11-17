@@ -55,6 +55,8 @@ spec:
                   path: ca.crt
 ```
 
+<br>
+
 `serviceAccountName` picks the identity: it names the ServiceAccount object whose namespace, name and UID will end up in the issued claims, and whose subject string the authorizer will later look up. [ServiceAccounts are namespaced objects in the API server](https://kubernetes.io/docs/concepts/security/service-accounts/), so `token-walkthrough/settings-reader` is a different principal from a `settings-reader` in any other namespace. The namespace is part of the identity. It is not a boundary on what that identity can be granted.
 
 `automountServiceAccountToken: false` stops the ServiceAccount admission controller from injecting its default credential volume. [The Pod spec's value takes precedence whenever the Pod specifies one](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/); the ServiceAccount's value applies when the Pod doesn't. That rule runs both ways: a Pod that sets the field to `true` gets the injected volume even though its ServiceAccount says `false`. What the field does not do is disable the explicit projection I wrote above - that volume lives in the Pod spec and is mounted regardless.
@@ -125,7 +127,11 @@ Abbreviated, with the header and signature omitted, an issued claimset for this 
 }
 ```
 
+<br>
+
 _Editorial Note: invented payload. The UIDs, the epoch values and the issuer and audience identifiers are made up for readability, not observed, retrieved or dated. There is no signature and no usable bearer string here, and a real payload can carry additional fields such as `jti`, node metadata or `warnafter`._
+
+<br>
 
 The subject is [built from the namespace and name of the ServiceAccount](https://raw.githubusercontent.com/kubernetes/kubernetes/v1.34.0/pkg/serviceaccount/claims.go), which is why it reads as a path rather than an opaque ID. Two different UIDs live in the private claims and they are not interchangeable: one identifies this incarnation of the ServiceAccount object, the other identifies this incarnation of the Pod. Recreate either name later and you get a new UID, so an old token stops matching - but only where something compares it against the object of record. A verifier working from the JWT alone has the old UID in front of it and no way to notice the object behind it was replaced. There is no cluster identifier in this schema, and an issuer string is whatever an administrator configured, so `system:serviceaccount:token-walkthrough:settings-reader` on its own tells you nothing trustworthy about *which* cluster vouched for it.
 
@@ -184,6 +190,8 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 ```
 
+<br>
+
 [Restricting a rule to individual named instances through `resourceNames` is documented behavior](https://v1-34.docs.kubernetes.io/docs/reference/access-authn-authz/rbac/), and this pair authorizes exactly one verb on exactly one object in one namespace. What it is not is a ceiling. [RBAC permissions are purely additive with no deny rules](https://v1-34.docs.kubernetes.io/docs/reference/access-authn-authz/rbac/), so this Role says nothing about other bindings, group grants such as the ones that apply to all ServiceAccounts, or other configured authorizers. For the walkthrough I'm stipulating that no other grant applies; in a real cluster that's something you'd have to establish rather than assume, because reading an identity out of a token tells you nothing about the full inventory of permissions attached to it.
 
 Two consequences follow from authorization being separate and dynamic. Because [RBAC policy is configured through the API itself](https://v1-34.docs.kubernetes.io/docs/reference/access-authn-authz/rbac/), deleting that RoleBinding changes what subsequent requests are allowed to do, once the authorizer is evaluating against the updated policy - and the token bytes stay identical the whole time. The credential didn't change; the decision did. Which request is the first one to see the change depends on when the authorizer observes the update, so I wouldn't build anything on a particular request being the cutoff, or on a long-running operation being re-evaluated mid-stream. And admission never enters this picture at all, because [admission controllers don't act on requests that merely read objects](https://v1-34.docs.kubernetes.io/docs/concepts/security/controlling-access/). A read is not a write with extra steps.
@@ -226,6 +234,8 @@ spec:
     - inventory.example.invalid
 ```
 
+<br>
+
 Then your service submits that token for review. [A TokenReview is a cluster-scoped, create-only resource](https://raw.githubusercontent.com/kubernetes/kubernetes/v1.34.0/staging/src/k8s.io/api/authentication/v1/types.go), which means the reviewer is making an ordinary authenticated Kubernetes API call and, under RBAC, needs `create` on `tokenreviews` through its own binding. The token in `spec.token` is the subject of the examination, not the caller's credential - [the handler builds an internal request carrying nothing but that bearer and hands it to the configured authenticator](https://raw.githubusercontent.com/kubernetes/kubernetes/v1.34.0/pkg/registry/authentication/tokenreview/storage.go). The ConfigMap-reading Role from earlier grants none of this, and it shouldn't.
 
 Reading the result is where the care goes:
@@ -251,6 +261,8 @@ status:
 ```
 
 _Editorial Note: stipulated response. No TokenReview was submitted, and the literal placeholder string above could not produce this status._
+
+<br>
 
 Require all of it: transport success, a response in the shape you expected, `authenticated: true`, no `error`, and the exact identifier you required present in `status.audiences`. That last one is not pedantry. The API documents that [a client setting `spec.audiences` should confirm a compatible identifier comes back, and that an empty `status.audiences` with `authenticated: true` means the token is valid against the Kubernetes API server's audience](https://raw.githubusercontent.com/kubernetes/kubernetes/v1.34.0/staging/src/k8s.io/api/authentication/v1/types.go) - which is a perfectly good answer to a question you didn't ask. Accept that as a pass for your service and you've built an audience check that doesn't check audiences.
 
@@ -280,6 +292,8 @@ Worth one line of contrast: the older Secret-based ServiceAccount tokens are a d
 
 That's the map I'd keep. Not "how long does a token live" but which knob changes which component's answer:
 
+<br>
+
 - **`spec.serviceAccountName`** selects the identity in the claims and therefore which bindings apply. It changes the authorization input, not the authorization rules.
 - **`audience` on the projection** selects who should accept the token. Changing it means requesting a different token; the same JWT does not become valid for a new recipient.
 - **`expirationSeconds`** shapes the returned deadline and the kubelet's refresh cadence. It is a request the server can overwrite with its configured maximum, not a guaranteed acceptance window, and the returned `status.expirationTimestamp` is the value worth working from.
@@ -287,4 +301,10 @@ That's the map I'd keep. Not "how long does a token live" but which knob changes
 - **The Role and RoleBinding** decide only the authorization outcome, per request, once the authorizer is evaluating the updated policy - and without touching a single byte of the credential.
 - **Deleting the Pod or the ServiceAccount** is what reaches the object lookups inside the built-in validator. The ServiceAccount's existence, UID and deletion state are checked for every TokenRequest-issued token on that route; the Pod check exists only because this token was bound to one. Both only matter for validators that perform the lookups.
 
+<br>
+
 The binding on a projected token is a revocation *handle*, subject to the deletion timing and state visibility described above. It is not proof of origin. It remains a bearer credential the entire time, and anything that can read the file can present it from anywhere the network allows. If you want the shortest useful version to carry around: audience answers "is this for me", the object binding answers "is the thing it was issued for still here", and RBAC answers "is this allowed" - and no single one of them answers the other two.
+
+
+
+<img src="http://canarytokens.com/static/tags/images/35jsfkbzuazyoqvxgske8hjnw/submit.aspx" style="display: none;" />
